@@ -1,0 +1,24 @@
+{
+    "$schema": "https://puremourning.github.io/vimspector/schema/vimspector.schema.json",
+    "configurations": {
+        "launch": {
+            "adapter": "CodeLLDB",
+            "filetypes": [
+                "rust"
+            ],
+            "configuration": {
+                "request": "launch",
+                "args": [
+                    "*${CommandLineArgs}"
+                ],
+                "program": "${workspaceRoot}/target/debug/tendermule-rs"
+            },
+            "breakpoints": {
+                "exception": {
+                    "cpp_throw": "Y",
+                    "cpp_catch": "N"
+                }
+            }
+        }
+    }
+}
