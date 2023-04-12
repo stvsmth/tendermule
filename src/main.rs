@@ -27,29 +27,38 @@ fn main() {
     let nouns_file = "words-nouns.txt";
     let nouns = read_file(nouns_file);
 
-    // TODO: add something along the lines of "with prefix `stv` and suffix `123` and max length 16"
-    let mut id = format!("No ID works with max-length of {}", args.max_length);
+    let mut max_length = args.max_length - args.prefix.len() - args.suffix.len();
+    let random_adj = choose_word(adjs, max_length);
 
-    // Naive version for now; we'll add more complex logic that will index into a
-    // word array sorted by length and then pick a random word from that array.
-    let mut rng = rand::thread_rng();
-    let remaining = 1000;
-    for _ in 0..remaining {
-        let adjective = capitalize_first_char(&adjs[rng.gen_range(0..adjs.len())]);
-        let noun = capitalize_first_char(&nouns[rng.gen_range(0..nouns.len())]);
-        let new_id = format!("{}{}{}{}", args.prefix, adjective, noun, args.suffix);
+    max_length -= random_adj.len();
+    let random_noun = choose_word(nouns, max_length);
 
-        if new_id.len() <= args.max_length {
-            id = new_id;
-            break;
-        }
-    }
+    let adjective = capitalize_first_char(&random_adj);
+    let noun = capitalize_first_char(&random_noun);
+    let new_id = format!("{}{}{}{}", args.prefix, adjective, noun, args.suffix);
 
-    if remaining > 0 {
-        println!("{}", id);
+    if new_id.len() <= args.max_length {
+        println!("{}", new_id);
     } else {
-        panic!("Failed to generate ID after {} attempts", remaining);
+        // TODO: add something along the lines of "We are unable to generate an id with prefix
+        // `stv` and suffix `123` and max length 16
+        panic!("Failed to generate correct length ID: {}", new_id);
     }
+}
+
+/// Given a vector of words, choose a random word that is less than or equal to
+/// the given max length.
+fn choose_word(words: Vec<String>, max_length: usize) -> String {
+    let filtered_words: Vec<String> = words
+        .iter()
+        .filter(|word| word.len() <= max_length)
+        .cloned()
+        .collect();
+
+    let mut rng = rand::thread_rng();
+    let random_index = rng.gen_range(0..=filtered_words.len() - 1);
+
+    filtered_words[random_index].clone()
 }
 
 fn read_file(filename: &str) -> Vec<String> {
