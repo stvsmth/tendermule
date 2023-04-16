@@ -40,7 +40,7 @@ fn main() {
     } else {
         // TODO: add something along the lines of "We are unable to generate an id with prefix
         // `stv` and suffix `123` and max length 16
-        panic!("Failed to generate correct length ID: {}", new_id);
+        panic!("Failed to generate correct length ID.");
     }
 }
 
@@ -64,5 +64,49 @@ fn capitalize_first_char(s: &str) -> String {
     match c.next() {
         None => String::new(),
         Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
+    }
+}
+
+// ///////////////////////////////////////////////////////////////////////////////////////////////
+// Tests
+// ///////////////////////////////////////////////////////////////////////////////////////////////
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_capitalize_first_char() {
+        assert_eq!(capitalize_first_char("hello"), "Hello");
+        assert_eq!(capitalize_first_char("i"), "I");
+        assert_eq!(capitalize_first_char(""), "");
+    }
+
+    #[test]
+    fn test_choose_word_any() {
+        let words = vec!["hello", "world", "four", "foo", "bar"];
+        let mut set = std::collections::HashSet::new();
+        for _ in 0..24 {
+            let word = choose_word(&words, 5);
+            set.insert(word);
+        }
+        assert!(set.contains("bar"));
+        assert!(set.contains("foo"));
+        assert!(set.contains("four"));
+        assert!(set.contains("hello"));
+        assert!(set.contains("world"));
+    }
+
+    #[test]
+    fn test_choose_word_with_limit() {
+        let words = vec!["hello", "world", "foo", "bar"];
+        let mut set = std::collections::HashSet::new();
+        for _ in 0..24 {
+            let word = choose_word(&words, 3);
+            set.insert(word);
+        }
+        assert!(set.contains("bar"));
+        assert!(set.contains("foo"));
+        assert_eq!(set.len(), 2);
     }
 }
