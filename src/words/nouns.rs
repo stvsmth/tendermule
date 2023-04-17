@@ -48,6 +48,7 @@ pub const NOUNS: &[&str] = &[
     "duck",
     "fish",
     "flea",
+    "fork",
     "fowl",
     "frog",
     "goat",
@@ -179,6 +180,8 @@ pub const NOUNS: &[&str] = &[
     "snake",
     "snipe",
     "spade",
+    "spoon",
+    "spork",
     "squid",
     "stoat",
     "stork",
@@ -355,4 +358,4 @@ pub const NOUNS: &[&str] = &[
     "whippet",
     "wildcat",
     "monster",
-]
+];
