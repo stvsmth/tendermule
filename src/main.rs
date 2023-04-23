@@ -1,6 +1,7 @@
 use clap::Parser;
 use rand::Rng;
-
+use std::collections::HashSet;
+use std::process::exit;
 mod words;
 
 #[derive(Parser, Debug)]
@@ -14,6 +15,10 @@ struct Args {
     #[arg(short, long, default_value = "")]
     suffix: String,
 
+    /// Number of unique identifiers to generate
+    #[arg(short, long, default_value_t = 1)]
+    count: usize,
+
     /// Maximum length of the final identifier
     #[arg(short, long, default_value_t = 16)]
     max_length: usize,
@@ -25,22 +30,37 @@ fn main() {
     let adjs = words::adjs::ADJS;
     let nouns = words::nouns::NOUNS;
 
-    let mut max_length = args.max_length - args.prefix.len() - args.suffix.len();
-    let random_adj = choose_word(adjs, max_length);
+    let max_length = args.max_length - args.prefix.len() - args.suffix.len();
 
-    max_length -= random_adj.len();
-    let random_noun = choose_word(nouns, max_length);
+    // Make the multiplier (100) an arg?
+    let mut max_attempts = args.count * 100;
+    let mut set = HashSet::new();
+    while max_attempts > 0 {
+        max_attempts -= 1;
+        let mut length = max_length;
+        let random_adj = choose_word(adjs, length);
+        length -= random_adj.len();
+        let random_noun = choose_word(nouns, length);
 
-    let adjective = capitalize_first_char(&random_adj);
-    let noun = capitalize_first_char(&random_noun);
-    let new_id = format!("{}{}{}{}", args.prefix, adjective, noun, args.suffix);
+        let adjective = capitalize_first_char(&random_adj);
+        let noun = capitalize_first_char(&random_noun);
+        let new_id = format!("{}{}{}{}", args.prefix, adjective, noun, args.suffix);
 
-    if new_id.len() <= args.max_length {
-        println!("{}", new_id);
-    } else {
-        // TODO: add something along the lines of "We are unable to generate an id with prefix
-        // `stv` and suffix `123` and max length 16
-        panic!("Failed to generate correct length ID.");
+        if new_id.len() <= args.max_length {
+            set.insert(new_id);
+            if set.len() == args.count {
+                break;
+            }
+        }
+    }
+
+    if max_attempts == 0 {
+        eprintln!("Failed to generate {} unique identifiers", args.count);
+        exit(1);
+    }
+
+    for id in set {
+        println!("{}", id);
     }
 }
 
