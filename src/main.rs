@@ -27,14 +27,41 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
+    if args.count == 0 {
+        eprintln!("Error: count must be greater than 0");
+        exit(128);
+    }
+
     let adjs = words::adjs::ADJS;
     let nouns = words::nouns::NOUNS;
-
     let max_length = args.max_length - args.prefix.len() - args.suffix.len();
 
+    // TODO: Pass args?
+    let results = generate_id(
+        adjs,
+        nouns,
+        args.prefix,
+        args.suffix,
+        args.count,
+        max_length,
+    );
+
+    for id in results {
+        println!("{}", id);
+    }
+}
+
+fn generate_id(
+    adjs: &[&str],
+    nouns: &[&str],
+    prefix: String,
+    suffix: String,
+    count: usize,
+    max_length: usize,
+) -> HashSet<String> {
     // Make the multiplier (100) an arg?
-    let mut max_attempts = args.count * 100;
-    let mut set = HashSet::new();
+    let mut max_attempts = count * 100;
+    let mut results = HashSet::new();
     while max_attempts > 0 {
         max_attempts -= 1;
         let mut length = max_length;
@@ -44,24 +71,20 @@ fn main() {
 
         let adjective = capitalize_first_char(&random_adj);
         let noun = capitalize_first_char(&random_noun);
-        let new_id = format!("{}{}{}{}", args.prefix, adjective, noun, args.suffix);
+        let new_id = format!("{}{}{}{}", prefix, adjective, noun, suffix);
 
-        if new_id.len() <= args.max_length {
-            set.insert(new_id);
-            if set.len() == args.count {
+        if new_id.len() <= max_length {
+            results.insert(new_id);
+            if results.len() == count {
                 break;
             }
         }
     }
 
     if max_attempts == 0 {
-        eprintln!("Failed to generate {} unique identifiers", args.count);
-        exit(1);
+        panic!("Failed to generate {} unique identifiers", count);
     }
-
-    for id in set {
-        println!("{}", id);
-    }
+    results
 }
 
 /// Given a vector of words, choose a random word that is less than or equal to
@@ -105,7 +128,7 @@ mod tests {
     #[test]
     fn test_choose_word_any() {
         let words = vec!["hello", "world", "four", "foo", "bar"];
-        let mut set = std::collections::HashSet::new();
+        let mut set = HashSet::new();
         for _ in 0..24 {
             let word = choose_word(&words, 5);
             set.insert(word);
@@ -120,7 +143,7 @@ mod tests {
     #[test]
     fn test_choose_word_with_limit() {
         let words = vec!["hello", "world", "foo", "bar"];
-        let mut set = std::collections::HashSet::new();
+        let mut set = HashSet::new();
         for _ in 0..24 {
             let word = choose_word(&words, 3);
             set.insert(word);
@@ -128,5 +151,26 @@ mod tests {
         assert!(set.contains("bar"));
         assert!(set.contains("foo"));
         assert_eq!(set.len(), 2);
+    }
+
+    #[test]
+    fn test_count_generates_unique_values() {
+        let adjs = vec!["blue", "gray", "red", "green"];
+        let nouns = vec!["cat", "dog", "bird", "fish"];
+        let count = 2;
+        let max_length = 10;
+        let ids = generate_id(
+            &adjs,
+            &nouns,
+            "".to_string(),
+            "".to_string(),
+            count,
+            max_length,
+        );
+        let results = ids.into_iter().collect::<Vec<String>>();
+        assert_eq!(results.len(), 2);
+        let id_1 = results[0].clone();
+        let id_2 = results[1].clone();
+        assert!(id_1 != id_2);
     }
 }
