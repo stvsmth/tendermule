@@ -34,16 +34,15 @@ fn main() {
 
     let adjs = words::adjs::ADJS;
     let nouns = words::nouns::NOUNS;
-    let max_length = args.max_length - args.prefix.len() - args.suffix.len();
+    let available_length = args.max_length - args.prefix.len() - args.suffix.len();
 
-    // TODO: Pass args?
-    let results = generate_id(
+    let results = generate_ids(
         adjs,
         nouns,
         args.prefix,
         args.suffix,
         args.count,
-        max_length,
+        available_length,
     );
 
     for id in results {
@@ -51,7 +50,7 @@ fn main() {
     }
 }
 
-fn generate_id(
+fn generate_ids(
     adjs: &[&str],
     nouns: &[&str],
     prefix: String,
@@ -159,7 +158,7 @@ mod tests {
         let nouns = vec!["cat", "dog", "bird", "fish"];
         let count = 2;
         let max_length = 10;
-        let ids = generate_id(
+        let ids = generate_ids(
             &adjs,
             &nouns,
             "".to_string(),
