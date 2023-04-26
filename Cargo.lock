@@ -288,7 +288,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tendermule-rs"
+name = "tendermule"
 version = "0.1.0"
 dependencies = [
  "clap",
