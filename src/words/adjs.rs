@@ -121,7 +121,6 @@ pub const ADJS: &[&str] = &[
     "acrid",
     "adhoc",
     "alert",
-    "alike",
     "aloof",
     "amuck",
     "angry",
