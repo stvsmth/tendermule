@@ -2,6 +2,9 @@
 name = "tendermule"
 version = "0.1.0"
 edition = "2021"
+repository = "https://github.com/stvsmth/tendermule-rs"
+description = "Generate a possibly amusing random identifier"
+license-file = "LICENSE"
 
 [dependencies]
 clap = { version = "4.2.1", features = ["derive"] }
