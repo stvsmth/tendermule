@@ -9,6 +9,17 @@ pub fn generate_ids(
     count: usize,
     max_length: usize,
 ) -> HashSet<String> {
+
+    // TODO: make this more dynamic
+    if prefix.len() > 5 {
+        eprintln!("Prefix must be less than or equal to 5 characters");
+        std::process::exit(1);
+    }
+    if suffix.len() > 5 {
+        eprintln!("Suffix must be less than or equal to 5 characters");
+        std::process::exit(1);
+    }
+
     // Make the multiplier (100) an arg?
     let mut max_attempts = count * 100;
     let mut results = HashSet::new();
