@@ -9,7 +9,6 @@ pub fn generate_ids(
     count: usize,
     max_length: usize,
 ) -> HashSet<String> {
-
     // TODO: make this more dynamic
     if prefix.len() > 5 {
         eprintln!("Prefix must be less than or equal to 5 characters");
@@ -25,16 +24,35 @@ pub fn generate_ids(
     let mut results = HashSet::new();
     while max_attempts > 0 {
         max_attempts -= 1;
+
         let mut length = max_length;
+
+        // Make this a constant
+        if length < 3 {
+            eprintln!(
+                "Prefix, suffix, and max_length must leave 3 characters for the generated id"
+            );
+            std::process::exit(1);
+        }
         let random_adj = choose_word(adjs, length);
         length -= random_adj.len();
+        let adjective = capitalize_first_char(&random_adj);
+        let mut new_id = format!("{}{}{}", prefix, adjective, suffix);
+        if length < 3 && new_id.len() <= max_length {
+            results.insert(new_id);
+            if results.len() == count {
+                break;
+            }
+        }
+
         let random_noun = choose_word(nouns, length);
 
-        let adjective = capitalize_first_char(&random_adj);
         let noun = capitalize_first_char(&random_noun);
-        let new_id = format!("{}{}{}{}", prefix, adjective, noun, suffix);
+        new_id = format!("{}{}{}{}", prefix, adjective, noun, suffix);
 
-        if new_id.len() <= max_length {
+        let new_id_len = new_id.len();
+        let id_fits = new_id_len <= max_length;
+        if id_fits {
             results.insert(new_id);
             if results.len() == count {
                 break;

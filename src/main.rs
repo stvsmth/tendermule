@@ -35,7 +35,6 @@ fn main() {
 
     let adjs = adjs::ADJS;
     let nouns = nouns::NOUNS;
-    let available_length = args.max_length - args.prefix.len() - args.suffix.len();
 
     let results = generate_ids(
         adjs,
@@ -43,7 +42,7 @@ fn main() {
         args.prefix,
         args.suffix,
         args.count,
-        available_length,
+        args.max_length,
     );
 
     for id in results {
