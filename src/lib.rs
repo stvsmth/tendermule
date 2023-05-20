@@ -10,12 +10,12 @@ pub fn generate_ids(
     max_length: usize,
 ) -> Result<HashSet<String>, String> {
     // TODO: make this more dynamic
-    if prefix.len() > 5 {
+    if prefix.chars().count() > 5 {
         return Err(String::from(
             "Prefix must be less than or equal to 5 characters",
         ));
     }
-    if suffix.len() > 5 {
+    if suffix.chars().count() > 5 {
         return Err(String::from(
             "Suffix must be less than or equal to 5 characters",
         ));
