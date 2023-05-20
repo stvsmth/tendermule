@@ -1,5 +1,6 @@
 use clap::Parser;
 use clap_num::number_range;
+use std::collections::HashSet;
 use tendermule::generate_ids;
 mod words;
 use words::adjs;
@@ -47,8 +48,15 @@ fn main() {
         args.count,
         args.max_length,
     );
+    if let Ok(results) = results {
+        print_results(results);
+    } else if let Err(e) = results {
+        eprintln!("Error: {}", e);
+    }
+}
 
-    for id in results {
-        println!("{}", id);
+fn print_results(results: HashSet<String>) {
+    for result in results {
+        println!("{}", result);
     }
 }
