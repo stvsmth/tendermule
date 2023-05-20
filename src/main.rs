@@ -9,7 +9,7 @@ fn valid_max_count(s: &str) -> Result<usize, String> {
     number_range(s, 1, 1_000_000)
 }
 
-fn valid_id_len(s: &str) -> Result<u8, String> {
+fn valid_id_len(s: &str) -> Result<usize, String> {
     number_range(s, 8, 255)
 }
 

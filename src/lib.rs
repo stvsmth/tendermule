@@ -152,4 +152,39 @@ mod tests {
         let id_2 = results[1].clone();
         assert!(id_1 != id_2);
     }
+
+    #[test]
+    fn test_capitalize_first_char_empty_string() {
+        assert_eq!(capitalize_first_char(""), "");
+    }
+
+    #[test]
+    fn test_capitalize_first_char_single_char() {
+        assert_eq!(capitalize_first_char("a"), "A");
+    }
+
+    #[test]
+    fn test_capitalize_first_char_multiple_chars() {
+        assert_eq!(capitalize_first_char("hello"), "Hello");
+    }
+
+    #[test]
+    fn test_capitalize_first_char_unicode() {
+        assert_eq!(capitalize_first_char("éclair"), "Éclair");
+    }
+
+    #[test]
+    fn test_capitalize_first_char_numbers() {
+        assert_eq!(capitalize_first_char("123"), "123");
+    }
+
+    #[test]
+    fn test_capitalize_first_char_emoji() {
+        assert_eq!(capitalize_first_char("💻 Sing Me a tune"), "💻 Sing Me a tune");
+    }
+
+    #[test]
+    fn test_capitalize_first_char_special_chars() {
+        assert_eq!(capitalize_first_char("!@#$"), "!@#$");
+    }
 }
