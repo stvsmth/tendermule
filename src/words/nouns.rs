@@ -1,3 +1,4 @@
+// Keep words one-to-a-line for cleaner diffs
 #[rustfmt::skip]
 pub const NOUNS: &[&str] = &[
     "ant",
