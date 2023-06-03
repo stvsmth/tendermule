@@ -2,8 +2,8 @@ use tendermule::generate_ids;
 
 #[test]
 fn test_count_generates_unique_values() {
-    let adjs = vec!["blue", "gray", "red", "green"];
-    let nouns = vec!["cat", "dog", "bird", "fish"];
+    let adjs = vec!["blue", "gray"];
+    let nouns = vec!["cat", "dog"];
     let count = 2;
     let max_length = 10;
     let ids = generate_ids(
