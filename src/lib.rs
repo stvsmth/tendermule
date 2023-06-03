@@ -149,7 +149,7 @@ fn capitalize_first_char(s: &str) -> String {
 //             count,
 //             max_length,
 //         );
-//         match 
+//         match
 //         let results = ids.into_iter().collect::<Vec<String>>();
 //         assert_eq!(results.len(), 2);
 //         let id_1 = results[0].clone();
