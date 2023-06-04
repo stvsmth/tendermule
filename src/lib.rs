@@ -18,12 +18,12 @@ pub fn generate_ids(
     config: &Config,
 ) -> Result<HashSet<String>, String> {
     // TODO: make this more dynamic
-    if config.prefix.chars().count() > 5 {
+    if config.prefix.chars().count() >= 5 {
         return Err(String::from(
             "Prefix must be less than or equal to 5 characters",
         ));
     }
-    if config.suffix.chars().count() > 5 {
+    if config.suffix.chars().count() >= 5 {
         return Err(String::from(
             "Suffix must be less than or equal to 5 characters",
         ));
