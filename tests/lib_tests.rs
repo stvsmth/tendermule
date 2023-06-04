@@ -1,6 +1,40 @@
 use tendermule::{generate_ids, Config};
 
 #[test]
+fn test_no_valid_words_generates_err() {
+    let adjs = vec!["spasmodic"];
+    let nouns = vec!["elephants"];
+
+    let config = Config {
+        prefix: String::from("stv"),
+        suffix: String::from(""),
+        count: 1,
+        max_length: 8,
+    };
+    let ids = generate_ids(&adjs, &nouns, &config).unwrap();
+    assert_eq!(ids.len(), 0);
+}
+
+#[test]
+fn test_returns_minimal_set_of_ids() {
+    let adjs = vec!["blue", "spasmodic"];
+    let nouns = vec!["cat", "elephants"];
+
+    let config = Config {
+        prefix: String::from(""),
+        suffix: String::from(""),
+        count: 2,
+        max_length: 8,
+    };
+    let ids = generate_ids(&adjs, &nouns, &config).unwrap();
+
+    // Ensure we get exactly 1 unique id
+    assert_eq!(ids.len(), 1);
+    let id_1 = ids.iter().next().unwrap();
+    assert_eq!(id_1, "BlueCat");
+}
+
+#[test]
 fn test_count_generates_unique_values() {
     let adjs = vec!["blue", "gray"];
     let nouns = vec!["cat", "dog"];

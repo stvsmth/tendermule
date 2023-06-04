@@ -64,6 +64,9 @@ pub fn generate_ids(
 
         let noun = capitalize_first_char(&random_noun);
         new_id = format!("{}{}{}{}", config.prefix, adjective, noun, config.suffix);
+        if new_id == format!("{}{}", config.prefix, config.suffix) {
+            continue;
+        }
 
         let new_id_len = new_id.len();
         let id_fits = new_id_len <= config.max_length;
@@ -76,12 +79,16 @@ pub fn generate_ids(
     }
 
     if max_attempts == 0 {
+        let results_len = results.len();
         let msg = format!(
-            "Failed to generate {} unique identifiers. Perhaps your max_length \
+            "Only generated {} of {} unique identifiers. Perhaps your max_length \
             is to small or your prefix/suffix are to large.",
+            results.len(),
             config.count
         );
-        return Err(msg);
+        if results_len == 0 {
+            eprintln!("{}", msg);
+        }
     }
 
     Ok(results)
