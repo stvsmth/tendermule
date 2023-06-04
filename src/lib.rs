@@ -1,33 +1,47 @@
 use rand::Rng;
 use std::collections::HashSet;
 
+pub const MAX_NUMBER_OF_IDS: usize = 1_000_000;
+pub const MIN_ID_LENGTH: usize = 8;
+pub const MAX_ID_LENGTH: usize = 256;
+
+pub struct Config {
+    pub prefix: String,
+    pub suffix: String,
+    pub count: usize,
+    pub max_length: usize,
+}
+
 pub fn generate_ids(
     adjs: &[&str],
     nouns: &[&str],
-    prefix: String,
-    suffix: String,
-    count: usize,
-    max_length: usize,
+    config: &Config,
 ) -> Result<HashSet<String>, String> {
     // TODO: make this more dynamic
-    if prefix.chars().count() > 5 {
+    if config.prefix.chars().count() > 5 {
         return Err(String::from(
             "Prefix must be less than or equal to 5 characters",
         ));
     }
-    if suffix.chars().count() > 5 {
+    if config.suffix.chars().count() > 5 {
         return Err(String::from(
             "Suffix must be less than or equal to 5 characters",
         ));
     }
+    if config.count > MAX_NUMBER_OF_IDS {
+        return Err(format!(
+            "Count must be less than or equal to {}",
+            MAX_NUMBER_OF_IDS
+        ));
+    }
 
     // Make the multiplier (100) an arg?
-    let mut max_attempts = count * 100;
+    let mut max_attempts = config.count * 100;
     let mut results = HashSet::new();
     while max_attempts > 0 {
         max_attempts -= 1;
 
-        let mut length = max_length;
+        let mut length = config.max_length;
 
         // Make this a constant
         if length < 3 {
@@ -38,10 +52,10 @@ pub fn generate_ids(
         let random_adj = choose_word(adjs, length);
         length -= random_adj.len();
         let adjective = capitalize_first_char(&random_adj);
-        let mut new_id = format!("{}{}{}", prefix, adjective, suffix);
-        if length < 3 && new_id.len() <= max_length {
+        let mut new_id = format!("{}{}{}", config.prefix, adjective, config.suffix);
+        if length < 3 && new_id.len() <= config.max_length {
             results.insert(new_id);
-            if results.len() == count {
+            if results.len() == config.count {
                 break;
             }
         }
@@ -49,20 +63,24 @@ pub fn generate_ids(
         let random_noun = choose_word(nouns, length);
 
         let noun = capitalize_first_char(&random_noun);
-        new_id = format!("{}{}{}{}", prefix, adjective, noun, suffix);
+        new_id = format!("{}{}{}{}", config.prefix, adjective, noun, config.suffix);
 
         let new_id_len = new_id.len();
-        let id_fits = new_id_len <= max_length;
+        let id_fits = new_id_len <= config.max_length;
         if id_fits {
             results.insert(new_id);
-            if results.len() == count {
+            if results.len() == config.count {
                 break;
             }
         }
     }
 
     if max_attempts == 0 {
-        let msg = format!("Failed to generate {} unique identifiers", count);
+        let msg = format!(
+            "Failed to generate {} unique identifiers. Perhaps your max_length \
+            is to small or your prefix/suffix are to large.",
+            config.count
+        );
         return Err(msg);
     }
 
@@ -79,9 +97,9 @@ fn choose_word(words: &[&str], max_length: usize) -> String {
         .collect();
 
     let mut rng = rand::thread_rng();
-    let random_index = rng.gen_range(0..=filtered_words.len() - 1);
-
-    filtered_words[random_index].to_string()
+    let max_index = filtered_words.len().saturating_sub(1);
+    let random_index = rng.gen_range(0..=max_index);
+    filtered_words.get(random_index).unwrap_or(&"").to_string()
 }
 
 fn capitalize_first_char(s: &str) -> String {
@@ -139,16 +157,13 @@ mod tests {
     fn test_count_generates_unique_values() {
         let adjs = vec!["blue", "gray", "red", "green"];
         let nouns = vec!["cat", "dog", "bird", "fish"];
-        let count = 2;
-        let max_length = 10;
-        let ids = generate_ids(
-            &adjs,
-            &nouns,
-            "".to_string(),
-            "".to_string(),
-            count,
-            max_length,
-        ).unwrap();
+        let config = Config {
+            prefix: String::from(""),
+            suffix: String::from(""),
+            count: 2,
+            max_length: 10,
+        };
+        let ids = generate_ids(&adjs, &nouns, &config).unwrap();
         let results = ids.into_iter().collect::<Vec<String>>();
         assert_eq!(results.len(), 2);
         let id_1 = results[0].clone();

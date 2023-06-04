@@ -1,24 +1,21 @@
-use tendermule::generate_ids;
+use tendermule::{generate_ids, Config};
 
 #[test]
 fn test_count_generates_unique_values() {
     let adjs = vec!["blue", "gray"];
     let nouns = vec!["cat", "dog"];
-    let count = 2;
-    let max_length = 10;
+
     for _ in 0..24 {
-        let ids = generate_ids(
-            &adjs,
-            &nouns,
-            "".to_string(),
-            "".to_string(),
-            count,
-            max_length,
-        )
-        .unwrap();
+        let config = Config {
+            prefix: String::from(""),
+            suffix: String::from(""),
+            count: 2,
+            max_length: 10,
+        };
+        let ids = generate_ids(&adjs, &nouns, &config).unwrap();
 
         // Ensure we get exactly 2 unique words
-        assert_eq!(ids.len(), count);
+        assert_eq!(ids.len(), config.count);
         let id_1 = ids.iter().next().unwrap();
         let id_2 = ids.iter().nth(1).unwrap();
         assert_ne!(id_1, id_2);

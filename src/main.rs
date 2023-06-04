@@ -1,17 +1,18 @@
 use clap::Parser;
 use clap_num::number_range;
 use std::collections::HashSet;
-use tendermule::generate_ids;
+use tendermule::{generate_ids, MAX_ID_LENGTH, MAX_NUMBER_OF_IDS, MIN_ID_LENGTH};
+
 mod words;
 use words::adjs;
 use words::nouns;
 
 fn valid_max_count(s: &str) -> Result<usize, String> {
-    number_range(s, 1, 1_000_000)
+    number_range(s, 1, MAX_NUMBER_OF_IDS)
 }
 
 fn valid_id_len(s: &str) -> Result<usize, String> {
-    number_range(s, 8, 255)
+    number_range(s, MIN_ID_LENGTH, MAX_ID_LENGTH)
 }
 
 #[derive(Parser, Debug)]
@@ -39,15 +40,14 @@ fn main() {
 
     let adjs = adjs::ADJS;
     let nouns = nouns::NOUNS;
+    let config = tendermule::Config {
+        prefix: args.prefix.clone(),
+        suffix: args.suffix.clone(),
+        count: args.count,
+        max_length: args.max_length,
+    };
 
-    let results = generate_ids(
-        adjs,
-        nouns,
-        args.prefix,
-        args.suffix,
-        args.count,
-        args.max_length,
-    );
+    let results = generate_ids(adjs, nouns, &config);
     if let Ok(results) = results {
         print_results(results);
     } else if let Err(e) = results {
