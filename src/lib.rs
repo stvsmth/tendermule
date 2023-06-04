@@ -12,6 +12,17 @@ pub struct Config {
     pub max_length: usize,
 }
 
+impl Default for Config {
+    fn default() -> Self {
+        Config {
+            prefix: String::from(""),
+            suffix: String::from(""),
+            count: 1,
+            max_length: 16,
+        }
+    }
+}
+
 pub fn generate_ids(
     adjs: &[&str],
     nouns: &[&str],
@@ -176,6 +187,18 @@ mod tests {
         let id_1 = results[0].clone();
         let id_2 = results[1].clone();
         assert!(id_1 != id_2);
+    }
+
+    #[test]
+    fn test_default_config_values() {
+        let adjs = vec!["astronomical"];
+        let nouns = vec!["goat"];
+        let config = Config::default();
+        let ids = generate_ids(&adjs, &nouns, &config).unwrap();
+        let results = ids.into_iter().collect::<Vec<String>>();
+        assert_eq!(results.len(), 1);
+        let id = results[0].clone();
+        assert_eq!(id, "AstronomicalGoat");
     }
 
     #[test]
