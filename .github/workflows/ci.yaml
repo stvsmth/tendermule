@@ -188,7 +188,7 @@ jobs:
         with:
           use-cross: ${{ matrix.job.use-cross }}
           command: run
-          args: --locked --target=${{ matrix.job.target }}
+          args: --bin tendermule --locked --target=${{ matrix.job.target }}
 
       - name: Create tarball
         id: package
