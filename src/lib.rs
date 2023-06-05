@@ -45,6 +45,12 @@ pub fn generate_ids(
             MAX_NUMBER_OF_IDS
         ));
     }
+    if config.max_length > MAX_ID_LENGTH {
+        return Err(format!(
+            "Max length must be less than or equal to {}",
+            MAX_ID_LENGTH
+        ));
+    }
 
     // Make the multiplier (100) an arg?
     let mut max_attempts = config.count * 100;
