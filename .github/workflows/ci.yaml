@@ -86,7 +86,7 @@ jobs:
               os: ubuntu-22.04,
               use-cross: true,
             }
-          - { target: x86_64-apple-darwin, os: macos-10.15 }
+          # - { target: x86_64-apple-darwin, os: macos-10.15 }  # Research why no runner picks this up.
           - { target: x86_64-pc-windows-gnu, os: windows-2019 }
           - { target: x86_64-pc-windows-msvc, os: windows-2019 }
           - { target: x86_64-unknown-linux-gnu, os: ubuntu-22.04 }
