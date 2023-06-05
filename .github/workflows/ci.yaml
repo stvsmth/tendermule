@@ -14,21 +14,8 @@ on:
       - "*"
 
 jobs:
-  ensure_cargo_fmt:
-    name: Ensure 'cargo fmt' has been run
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          default: true
-          profile: minimal
-          components: rustfmt
-      - uses: actions/checkout@v3
-      - run: cargo fmt -- --check
-
-  min_version:
-    name: Minimum supported rust version
+  code_checks:
+    name: Run linter and tests
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout source code
@@ -46,6 +33,11 @@ jobs:
         with:
           command: clippy
           args: --locked --all-targets --all-features
+      - name: Run formatter
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --check
       - name: Run tests
         uses: actions-rs/cargo@v1
         with:
