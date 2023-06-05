@@ -1,3 +1,5 @@
+![tender-mule](https://github.com/stvsmth/tendermule-rs/assets/3330805/2e8a01b3-098f-44d9-a925-cc851fe0fe0f)
+
 # tendermule
 
 This is a simple utility that generates unique identifiers with some constraints. Why is
