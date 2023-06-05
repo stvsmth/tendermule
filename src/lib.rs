@@ -153,7 +153,10 @@ mod tests {
     fn test_choose_word_any() {
         let words = vec!["hello", "world", "four", "foo", "bar"];
         let mut set = HashSet::new();
-        for _ in 0..24 {
+        let mut i = 0;
+        let max_runs = 200;
+        while set.len() != 5 && i < max_runs {
+            i += 1;
             let word = choose_word(&words, 5);
             set.insert(word);
         }
