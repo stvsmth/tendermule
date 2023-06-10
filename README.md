@@ -1,4 +1,4 @@
-![tender-mule](https://github.com/stvsmth/tendermule-rs/assets/3330805/2e8a01b3-098f-44d9-a925-cc851fe0fe0f)
+![tender-mule-med](https://github.com/stvsmth/tendermule-rs/assets/3330805/d0410869-ce97-4446-b6bd-724232207bdd)
 
 # tendermule
 
