@@ -13,9 +13,9 @@ group my tasks together, as well as alert others on the team that these were my 
 This started as a Python project, but I moved it to Rust so that I could distribute it as a
 self-contained binary (or even an embedded library).
 
-Currently, each identifier will always be in the form of `AdjectiveNoun`, and will always be in
-snake case. You can supply a prefix or suffix of up to five characters; we honor the case of the
-prefix and suffix inputs.
+Currently, each identifier will always be in the form of `AdjectiveNoun`, and will always have the
+first letter of each word capitalized (camel case). You can supply a prefix or suffix of up to five
+characters; we honor the case of the prefix and suffix inputs.
 
 You may request more than one identifier. The results are guaranteed to be unique;
 however, your combination of maximum length, prefix, and suffix could result in limited
