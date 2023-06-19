@@ -1,14 +1,14 @@
 use clap::Parser;
 use clap_num::number_range;
 use std::collections::HashSet;
-use tendermule::{generate_ids, MAX_ID_LENGTH, MAX_NUMBER_OF_IDS, MIN_ID_LENGTH};
+use tendermule::{generate_ids, MAX_ID_LENGTH, MAX_IDS_COUNT, MIN_ID_LENGTH};
 
 mod words;
 use words::adjs;
 use words::nouns;
 
 fn valid_max_count(s: &str) -> Result<usize, String> {
-    number_range(s, 1, MAX_NUMBER_OF_IDS)
+    number_range(s, 1, MAX_IDS_COUNT)
 }
 
 fn valid_id_len(s: &str) -> Result<usize, String> {
