@@ -26,11 +26,11 @@ impl Default for Config {
 
 pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<HashSet<String>> {
     // TODO: make this more dynamic
-    if config.prefix.chars().count() >= 5 {
-        return Err(anyhow!("Prefix must be less than or equal to 5 characters",));
+    if config.prefix.chars().count() > 5 {
+        return Err(anyhow!("Prefix must be less than or equal to 5 characters"));
     }
-    if config.suffix.chars().count() >= 5 {
-        return Err(anyhow!("Suffix must be less than or equal to 5 characters",));
+    if config.suffix.chars().count() > 5 {
+        return Err(anyhow!("Suffix must be less than or equal to 5 characters"));
     }
     if config.count > MAX_IDS_COUNT {
         return Err(anyhow!(
@@ -89,15 +89,22 @@ pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<Ha
     }
 
     if max_attempts == 0 {
-        let results_len = results.len();
-        let msg = format!(
-            "Only generated {} of {} unique identifiers. Perhaps your max_length \
-            is to small or your prefix/suffix are to large.",
-            results.len(),
-            config.count
-        );
-        if results_len == 0 {
-            eprintln!("{}", msg);
+        let suggestion = "Perhaps your max_length is to small or your prefix/suffix are too large.";
+        match results.len() {
+            0 => {
+                return Err(anyhow!(
+                    "Unable to generate any unique identifiers. {}",
+                    suggestion
+                ));
+            }
+            _ => {
+                return Err(anyhow!(
+                    "Only generated {} of {} unique identifiers. {}",
+                    results.len(),
+                    config.count,
+                    suggestion,
+                ));
+            }
         }
     }
 

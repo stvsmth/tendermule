@@ -11,8 +11,8 @@ fn test_no_valid_words_generates_err() {
         count: 1,
         max_length: 8,
     };
-    let ids = generate_ids(&adjs, &nouns, &config).unwrap();
-    assert_eq!(ids.len(), 0);
+    let ids = generate_ids(&adjs, &nouns, &config);
+    assert!(ids.is_err());
 }
 
 #[test]
@@ -53,7 +53,7 @@ fn test_returns_minimal_set_of_ids() {
     let config = Config {
         prefix: String::from(""),
         suffix: String::from(""),
-        count: 2,
+        count: 1,
         max_length: 8,
     };
     let ids = generate_ids(&adjs, &nouns, &config).unwrap();
