@@ -1,7 +1,7 @@
 use clap::Parser;
 use clap_num::number_range;
 use std::collections::HashSet;
-use tendermule::{generate_ids, MAX_ID_LENGTH, MAX_IDS_COUNT, MIN_ID_LENGTH};
+use tendermule::{generate_ids, MAX_IDS_COUNT, MAX_ID_LENGTH, MIN_ID_LENGTH};
 
 mod words;
 use words::adjs;
@@ -19,19 +19,19 @@ fn valid_id_len(s: &str) -> Result<usize, String> {
 #[command(author, version, about, long_about = None)]
 struct Args {
     /// String to prepend to front of identifier, included when considering max length
-    #[arg(short, long, default_value = "")]
+    #[arg(short, long, env = "TMULE_PREFIX", default_value = "")]
     prefix: String,
 
     /// String to append to end of identifier, included when considering max length
-    #[arg(short, long, default_value = "")]
+    #[arg(short, long, env = "TMULE_SUFFIX", default_value = "")]
     suffix: String,
 
     /// Number of unique identifiers to generate
-    #[arg(short, long, default_value_t = 1, value_parser=valid_max_count)]
+    #[arg(short, long, env = "TMULE_COUNT", default_value_t = 1, value_parser=valid_max_count)]
     count: usize,
 
     /// Maximum length of the final identifier
-    #[arg(short, long, default_value_t = 16, value_parser=valid_id_len)]
+    #[arg(short, long, env = "TMULE_MAX_LENGTH", default_value_t = 16, value_parser=valid_id_len)]
     max_length: usize,
 }
 
