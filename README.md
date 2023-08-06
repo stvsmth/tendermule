@@ -41,11 +41,19 @@ stvElderlyBoar
 
 See `--help` for other options.
 
+## Installation
+
+* You can install pre-built binaries from the [releases
+  page](https://github.com/stvsmth/tendermule-rs/releases/).
+* Alternatively, if you have a Rust toolchain installed you can clone this
+  repo build with `cargo build --release`.
+
+
 ## Can I ...
 
-* Pass in my own list of adjectives and nouns
-* Filter out certain adjectives or nouns from the provided list
-* Fill the result to some fixed length (with random characters)
-* Control the case of the identifier
+* Pass in my own list of adjectives and nouns?
+* Filter out certain adjectives or nouns from the provided list?
+* Fill the result to some fixed length (with random characters)?
+* Control the case of the identifier?
 
 The answer to all of the above is the same: Not yet, but maybe later.
