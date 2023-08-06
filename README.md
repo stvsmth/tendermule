@@ -31,7 +31,7 @@ WastefulGuppy
 
 Generate 4 unique identifiers, with a prefix
 ```
-$ tendermule --prefix stv --count 4
+$ tendermule --prefix stv --count 5
 stvCurvyDancer
 stvSteadyDiamond
 stvSecretLoon
@@ -48,4 +48,4 @@ See `--help` for other options.
 * Fill the result to some fixed length (with random characters)
 * Control the case of the identifier
 
-The answer to all of the above is the same: Not yet, but probably later.
+The answer to all of the above is the same: Not yet, but maybe later.
