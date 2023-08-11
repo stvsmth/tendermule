@@ -11,7 +11,8 @@
                 "args": [
                     "*${CommandLineArgs}"
                 ],
-                "program": "${workspaceRoot}/target/debug/tendermule"
+                // "program": "${workspaceRoot}/target/debug/deps/lib_tests-b49333b9f9aafdf8"
+                 "program": "${workspaceRoot}/target/debug/tendermule"
             },
             "breakpoints": {
                 "exception": {
