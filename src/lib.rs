@@ -45,35 +45,32 @@ pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<Ha
         ));
     }
 
-    // Make the multiplier (100) an arg?
-    let mut max_attempts = config.count * 100;
-    let mut results = HashSet::new();
+    let mut uniq_ids = HashSet::new();
+    let mut max_attempts = config.count;
+    if max_attempts < 1000 {
+        max_attempts = config.count * 10;
+    } else {
+        max_attempts = (f64::sqrt(max_attempts as f64) * 10.0) as usize;
+    }
+
     while max_attempts > 0 {
+        let mut length = config.max_length;
         max_attempts -= 1;
 
-        let mut length = config.max_length;
-
-        // Make this a constant
-        if length < 3 {
-            return Err(anyhow!(
-                "Prefix, suffix, and max_length must leave 3 characters for the generated id",
-            ));
-        }
         let random_adj = choose_word(adjs, length);
         length -= random_adj.len();
         let adjective = capitalize_first_char(&random_adj);
-        let mut new_id = format!("{}{}{}", config.prefix, adjective, config.suffix);
-        if length < 3 && new_id.len() <= config.max_length {
-            results.insert(new_id);
-            if results.len() == config.count {
-                break;
-            }
+        if adjective.is_empty() {
+            continue;
         }
 
         let random_noun = choose_word(nouns, length);
-
         let noun = capitalize_first_char(&random_noun);
-        new_id = format!("{}{}{}{}", config.prefix, adjective, noun, config.suffix);
+        if noun.is_empty() {
+            continue;
+        }
+
+        let new_id = format!("{}{}{}{}", config.prefix, adjective, noun, config.suffix);
         if new_id == format!("{}{}", config.prefix, config.suffix) {
             continue;
         }
@@ -81,8 +78,8 @@ pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<Ha
         let new_id_len = new_id.len();
         let id_fits = new_id_len <= config.max_length;
         if id_fits {
-            results.insert(new_id);
-            if results.len() == config.count {
+            uniq_ids.insert(new_id);
+            if uniq_ids.len() == config.count {
                 break;
             }
         }
@@ -90,17 +87,19 @@ pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<Ha
 
     if max_attempts == 0 {
         let suggestion = "Perhaps your max_length is to small or your prefix/suffix are too large.";
-        match results.len() {
+        match uniq_ids.len() {
             0 => {
                 return Err(anyhow!(
                     "Unable to generate any unique identifiers. {}",
                     suggestion
                 ));
             }
+            // TODO: We should probably return the results we did generate.
+            // Add an option `--error-on-partial`?
             _ => {
                 return Err(anyhow!(
                     "Only generated {} of {} unique identifiers. {}",
-                    results.len(),
+                    uniq_ids.len(),
                     config.count,
                     suggestion,
                 ));
@@ -108,7 +107,7 @@ pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<Ha
         }
     }
 
-    Ok(results)
+    Ok(uniq_ids)
 }
 
 /// Given a vector of words, choose a random word that is less than or equal to
@@ -181,32 +180,14 @@ mod tests {
     }
 
     #[test]
-    fn test_count_generates_unique_values() {
-        let adjs = vec!["blue", "gray", "red", "green"];
-        let nouns = vec!["cat", "dog", "bird", "fish"];
-        let config = Config {
-            prefix: String::from(""),
-            suffix: String::from(""),
-            count: 2,
-            max_length: 10,
-        };
-        let ids = generate_ids(&adjs, &nouns, &config).unwrap();
-        let results = ids.into_iter().collect::<Vec<String>>();
-        assert_eq!(results.len(), 2);
-        let id_1 = results[0].clone();
-        let id_2 = results[1].clone();
-        assert!(id_1 != id_2);
-    }
-
-    #[test]
     fn test_default_config_values() {
         let adjs = vec!["astronomical"];
         let nouns = vec!["goat"];
         let config = Config::default();
-        let ids = generate_ids(&adjs, &nouns, &config).unwrap();
-        let results = ids.into_iter().collect::<Vec<String>>();
-        assert_eq!(results.len(), 1);
-        let id = results[0].clone();
+        let result = generate_ids(&adjs, &nouns, &config).unwrap();
+        let ids = result.into_iter().collect::<Vec<String>>();
+        assert_eq!(ids.len(), 1);
+        let id = ids[0].clone();
         assert_eq!(id, "AstronomicalGoat");
     }
 

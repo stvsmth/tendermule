@@ -1,3 +1,4 @@
+
 {
     "$schema": "https://puremourning.github.io/vimspector/schema/vimspector.schema.json",
     "configurations": {
@@ -11,8 +12,28 @@
                 "args": [
                     "*${CommandLineArgs}"
                 ],
-                // "program": "${workspaceRoot}/target/debug/deps/lib_tests-b49333b9f9aafdf8"
-                 "program": "${workspaceRoot}/target/debug/tendermule"
+                // "program": "${workspaceRoot}/target/debug/tendermule"
+                "program": "${workspaceRoot}/target/debug/deps/lib_tests-b49333b9f9aafdf8"
+            },
+            "breakpoints": {
+                "exception": {
+                    "cpp_throw": "Y",
+                    "cpp_catch": "N"
+                }
+            }
+        },
+        "test": {
+            "adapter": "CodeLLDB",
+            "filetypes": [
+                "rust"
+            ],
+            "configuration": {
+                "request": "launch",
+                "args": [
+                    "test"
+                ],
+                "program": "cargo",
+                "cwd": "${workspaceRoot}"
             },
             "breakpoints": {
                 "exception": {
@@ -23,3 +44,4 @@
         }
     }
 }
+
