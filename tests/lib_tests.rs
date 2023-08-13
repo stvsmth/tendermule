@@ -66,10 +66,10 @@ fn test_returns_minimal_set_of_ids() {
 
 #[test]
 fn test_count_generates_unique_values() {
-    let adjs = vec!["blue", "gray", "red", "bold"];
-    let nouns = vec!["cat", "dog", "ape", "flea"];
+    let adjs = vec!["blue", "gray", "red", "bold", "sly"];
+    let nouns = vec!["cat", "dog", "ape", "flea", "eel"];
 
-    for i in 0..24 {
+    for _ in 0..1000 {
         let config = Config {
             prefix: String::from(""),
             suffix: String::from(""),
@@ -77,34 +77,23 @@ fn test_count_generates_unique_values() {
             max_length: 10,
         };
         let result = generate_ids(&adjs, &nouns, &config);
-        match result {
-            Ok(ids) => {
-                let results = ids.into_iter().collect::<Vec<String>>();
-                assert_eq!(results.len(), 2);
-                let id_1 = results[0].clone();
-                let id_2 = results[1].clone();
-                assert!(id_1 != id_2);
-            }
-            Err(e) => {
-                println!("{}: {}", i, e);
-                panic!("Error generating ids");
-            }
-        }
+        let ids = result.unwrap();
 
-        // Ensure we get exactly 2 unique words
-        // assert_eq!(result.len(), config.count);
-        // let id_1 = result.iter().next().unwrap();
-        // let id_2 = result.iter().nth(1).unwrap();
-        // assert_ne!(id_1, id_2);
-        //
-        // // Ensure the generated ids contain an adj and noun
-        // assert!(adjs.iter().any(|&adj| id_1.to_lowercase().contains(adj)));
-        // assert!(nouns.iter().any(|&noun| id_1.to_lowercase().contains(noun)));
-        //
-        // assert!(adjs.iter().any(|&adj| id_2.to_lowercase().contains(adj)));
-        // assert!(nouns.iter().any(|&noun| id_2.to_lowercase().contains(noun)));
+        // Ensure we get exactly 2 unique ids
+        assert_eq!(ids.len(), 2);
+        let id_1 = ids.iter().next().unwrap();
+        let id_2 = ids.iter().nth(1).unwrap();
+        assert_ne!(id_1, id_2);
+
+        // Ensure the generated ids contain an adj and noun
+        assert!(adjs.iter().any(|&adj| id_1.to_lowercase().contains(adj)));
+        assert!(nouns.iter().any(|&noun| id_1.to_lowercase().contains(noun)));
+
+        assert!(adjs.iter().any(|&adj| id_2.to_lowercase().contains(adj)));
+        assert!(nouns.iter().any(|&noun| id_2.to_lowercase().contains(noun)));
     }
 }
+
 #[test]
 fn test_fixes_check() {
     let adjs = vec!["blue", "gray"];
@@ -176,8 +165,7 @@ fn test_max_count_check() {
     if let Err(e) = result {
         assert_eq!(
             format!("{}", e),
-            "Only generated 4 of 1000000 unique identifiers. \
-        Perhaps your max_length is to small or your prefix/suffix are too large."
+            "Not enough unique IDs available for the given count. Only 4 IDs available."
         );
     }
 
@@ -213,8 +201,7 @@ fn test_fixes_overwhelm() {
     if let Err(e) = result {
         assert_eq!(
             format!("{}", e),
-            "Unable to generate any unique identifiers. \
-            Perhaps your max_length is to small or your prefix/suffix are too large."
+            "No unique IDs available for the given constraints."
         );
     }
 }
@@ -234,8 +221,7 @@ fn test_handle_never_finds_small_enough_word() {
     if let Err(e) = result {
         assert_eq!(
             format!("{}", e),
-            "Unable to generate any unique identifiers. \
-            Perhaps your max_length is to small or your prefix/suffix are too large."
+            "No unique IDs available for the given constraints."
         );
     }
 }

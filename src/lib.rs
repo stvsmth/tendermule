@@ -45,84 +45,47 @@ pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<Ha
         ));
     }
 
-    let mut uniq_ids = HashSet::new();
-    let mut max_attempts = config.count;
-    if max_attempts < 1000 {
-        max_attempts = config.count * 10;
-    } else {
-        max_attempts = (f64::sqrt(max_attempts as f64) * 10.0) as usize;
-    }
+    let distinct_ids_avail = adjs.len() * nouns.len();
+    let mut uniq_ids = Vec::with_capacity(distinct_ids_avail / 4);
 
-    while max_attempts > 0 {
-        let mut length = config.max_length;
-        max_attempts -= 1;
-
-        let random_adj = choose_word(adjs, length);
-        length -= random_adj.len();
-        let adjective = capitalize_first_char(&random_adj);
-        if adjective.is_empty() {
-            continue;
-        }
-
-        let random_noun = choose_word(nouns, length);
-        let noun = capitalize_first_char(&random_noun);
-        if noun.is_empty() {
-            continue;
-        }
-
-        let new_id = format!("{}{}{}{}", config.prefix, adjective, noun, config.suffix);
-        if new_id == format!("{}{}", config.prefix, config.suffix) {
-            continue;
-        }
-
-        let new_id_len = new_id.len();
-        let id_fits = new_id_len <= config.max_length;
-        if id_fits {
-            uniq_ids.insert(new_id);
-            if uniq_ids.len() == config.count {
-                break;
+    // Build a vec of all available ids for given constraints
+    for adj in adjs {
+        let adj = capitalize_first_char(adj);
+        for noun in nouns {
+            let noun = capitalize_first_char(noun);
+            let id = format!("{}{}{}{}", config.prefix, adj, noun, config.suffix);
+            if id.len() <= config.max_length {
+                uniq_ids.push(id);
             }
         }
     }
 
-    if max_attempts == 0 {
-        let suggestion = "Perhaps your max_length is to small or your prefix/suffix are too large.";
-        match uniq_ids.len() {
-            0 => {
-                return Err(anyhow!(
-                    "Unable to generate any unique identifiers. {}",
-                    suggestion
-                ));
-            }
-            // TODO: We should probably return the results we did generate.
-            // Add an option `--error-on-partial`?
-            _ => {
-                return Err(anyhow!(
-                    "Only generated {} of {} unique identifiers. {}",
-                    uniq_ids.len(),
-                    config.count,
-                    suggestion,
-                ));
-            }
-        }
+    // Return an error if there are no unique IDs available
+    if uniq_ids.is_empty() {
+        return Err(anyhow!(
+            "No unique IDs available for the given constraints."
+        ));
+    }
+    // ... or not enough unique IDs to satisfy the request
+    if uniq_ids.len() < config.count {
+        return Err(anyhow!(
+            "Not enough unique IDs available for the given count. Only {} IDs available.",
+            uniq_ids.len()
+        ));
     }
 
-    Ok(uniq_ids)
-}
-
-/// Given a vector of words, choose a random word that is less than or equal to
-/// the given max length.
-fn choose_word(words: &[&str], max_length: usize) -> String {
-    let filtered_words: Vec<&str> = words
-        .iter()
-        .filter(|word| word.len() <= max_length)
-        .cloned()
-        .collect();
-
+    // Randomly choose config.count number of ids from the precomputed list
+    let mut random_ids = HashSet::with_capacity(config.count);
     let mut rng = rand::thread_rng();
-    let max_index = filtered_words.len().saturating_sub(1);
-    let random_index = rng.gen_range(0..=max_index);
-    filtered_words.get(random_index).unwrap_or(&"").to_string()
+
+    while random_ids.len() != config.count {
+        let random_index = rng.gen_range(0..uniq_ids.len());
+        if let Some(id) = uniq_ids.get(random_index) {
+            random_ids.insert(id.clone());
+        }
+    }
+
+    Ok(random_ids)
 }
 
 fn capitalize_first_char(s: &str) -> String {
@@ -146,37 +109,6 @@ mod tests {
         assert_eq!(capitalize_first_char("hello"), "Hello");
         assert_eq!(capitalize_first_char("i"), "I");
         assert_eq!(capitalize_first_char(""), "");
-    }
-
-    #[test]
-    fn test_choose_word_any() {
-        let words = vec!["hello", "world", "four", "foo", "bar"];
-        let mut set = HashSet::new();
-        let mut i = 0;
-        let max_runs = 200;
-        while set.len() != 5 && i < max_runs {
-            i += 1;
-            let word = choose_word(&words, 5);
-            set.insert(word);
-        }
-        assert!(set.contains("bar"));
-        assert!(set.contains("foo"));
-        assert!(set.contains("four"));
-        assert!(set.contains("hello"));
-        assert!(set.contains("world"));
-    }
-
-    #[test]
-    fn test_choose_word_with_limit() {
-        let words = vec!["hello", "world", "foo", "bar"];
-        let mut set = HashSet::new();
-        for _ in 0..24 {
-            let word = choose_word(&words, 3);
-            set.insert(word);
-        }
-        assert!(set.contains("bar"));
-        assert!(set.contains("foo"));
-        assert_eq!(set.len(), 2);
     }
 
     #[test]
