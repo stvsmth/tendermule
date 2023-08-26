@@ -2,9 +2,9 @@ use anyhow::{anyhow, Result};
 use rand::Rng;
 use std::collections::HashSet;
 
-pub const MAX_IDS_COUNT: usize = 1_000_000;
+pub const MAX_IDS_COUNT: usize = 999_999;
 pub const MIN_ID_LENGTH: usize = 8;
-pub const MAX_ID_LENGTH: usize = 256;
+pub const MAX_ID_LENGTH: usize = 255;
 
 pub struct Config {
     pub prefix: String,
@@ -27,22 +27,16 @@ impl Default for Config {
 pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<HashSet<String>> {
     // TODO: make this more dynamic
     if config.prefix.chars().count() > 5 {
-        return Err(anyhow!("Prefix must be less than or equal to 5 characters"));
+        return Err(anyhow!("Prefix must be 5 characters or less."));
     }
     if config.suffix.chars().count() > 5 {
-        return Err(anyhow!("Suffix must be less than or equal to 5 characters"));
+        return Err(anyhow!("Suffix must be 5 characters or less."));
     }
     if config.count > MAX_IDS_COUNT {
-        return Err(anyhow!(
-            "Count must be less than or equal to {}",
-            MAX_IDS_COUNT
-        ));
+        return Err(anyhow!("Count must be {} or less.", MAX_IDS_COUNT));
     }
     if config.max_length > MAX_ID_LENGTH {
-        return Err(anyhow!(
-            "Max length must be less than or equal to {}",
-            MAX_ID_LENGTH
-        ));
+        return Err(anyhow!("Max length must be {} or less.", MAX_ID_LENGTH));
     }
 
     let distinct_ids_avail = adjs.len() * nouns.len();
@@ -68,10 +62,11 @@ pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<Ha
     }
     // ... or not enough unique IDs to satisfy the request
     if uniq_ids.len() < config.count {
-        return Err(anyhow!(
-            "Not enough unique IDs available for the given count. Only {} IDs available.",
-            uniq_ids.len()
-        ));
+        return Err(anyhow!(format!(
+            "Only {} IDs available, cannot produce {}.",
+            uniq_ids.len(),
+            config.count
+        )));
     }
 
     // Randomly choose config.count number of ids from the precomputed list

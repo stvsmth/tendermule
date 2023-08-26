@@ -1,4 +1,4 @@
-use tendermule::{generate_ids, Config};
+use tendermule::*;
 
 #[test]
 fn test_no_valid_words_generates_err() {
@@ -9,36 +9,6 @@ fn test_no_valid_words_generates_err() {
         prefix: String::from("stv"),
         suffix: String::from(""),
         count: 1,
-        max_length: 8,
-    };
-    let result = generate_ids(&adjs, &nouns, &config);
-    assert!(result.is_err());
-}
-
-#[test]
-fn test_invalid_max_length_param() {
-    let adjs = vec!["blue"];
-    let nouns = vec!["cat"];
-
-    let config = Config {
-        prefix: String::from(""),
-        suffix: String::from(""),
-        count: 1,
-        max_length: 257,
-    };
-    let result = generate_ids(&adjs, &nouns, &config);
-    assert!(result.is_err());
-}
-
-#[test]
-fn test_invalid_count_param() {
-    let adjs = vec!["blue"];
-    let nouns = vec!["cat"];
-
-    let config = Config {
-        prefix: String::from(""),
-        suffix: String::from(""),
-        count: 1_000_001,
         max_length: 8,
     };
     let result = generate_ids(&adjs, &nouns, &config);
@@ -108,10 +78,7 @@ fn test_fixes_check() {
     assert!(result.is_err());
 
     if let Err(e) = result {
-        assert_eq!(
-            format!("{}", e),
-            "Prefix must be less than or equal to 5 characters"
-        );
+        assert_eq!(format!("{}", e), "Prefix must be 5 characters or less.");
     }
     config.prefix = String::from("");
     config.suffix = String::from("123456");
@@ -119,9 +86,25 @@ fn test_fixes_check() {
     assert!(result.is_err());
 
     if let Err(e) = result {
+        assert_eq!(format!("{}", e), "Suffix must be 5 characters or less.");
+    }
+}
+#[test]
+fn test_max_count_boundary() {
+    let adjs = vec!["blue", "gray"];
+    let nouns = vec!["cat", "dog"];
+    let config = Config {
+        prefix: String::from(""),
+        suffix: String::from(""),
+        count: 1_000_001,
+        max_length: 16,
+    };
+    let result = generate_ids(&adjs, &nouns, &config);
+    assert!(result.is_err());
+    if let Err(e) = result {
         assert_eq!(
             format!("{}", e),
-            "Suffix must be less than or equal to 5 characters"
+            format!("Count must be {} or less.", MAX_IDS_COUNT),
         );
     }
 }
@@ -134,50 +117,36 @@ fn test_max_length_check() {
         prefix: String::from(""),
         suffix: String::from(""),
         count: 2,
-        max_length: 256,
+        max_length: 255,
     };
     let result = generate_ids(&adjs, &nouns, &config).unwrap();
     assert_eq!(result.len(), 2);
 
-    config.max_length = 257;
+    config.max_length = 256;
     let result = generate_ids(&adjs, &nouns, &config);
     assert!(result.is_err());
     if let Err(e) = result {
         assert_eq!(
             format!("{}", e),
-            "Max length must be less than or equal to 256"
+            format!("Max length must be {} or less.", MAX_ID_LENGTH),
         );
     }
 }
 
 #[test]
-fn test_max_count_check() {
+fn test_not_enough_unique_ids() {
     let adjs = vec!["blue", "gray"];
     let nouns = vec!["cat", "dog"];
-    let mut config = Config {
+    let config = Config {
         prefix: String::from(""),
         suffix: String::from(""),
-        count: 1_000_000,
+        count: 9,
         max_length: 16,
     };
     let result = generate_ids(&adjs, &nouns, &config);
     assert!(result.is_err());
     if let Err(e) = result {
-        assert_eq!(
-            format!("{}", e),
-            "Not enough unique IDs available for the given count. Only 4 IDs available."
-        );
-    }
-
-    config.count = 1_000_001;
-    let result = generate_ids(&adjs, &nouns, &config);
-    assert!(result.is_err());
-
-    if let Err(e) = result {
-        assert_eq!(
-            format!("{}", e),
-            "Count must be less than or equal to 1000000"
-        );
+        assert_eq!(format!("{}", e), "Only 4 IDs available, cannot produce 9.");
     }
 }
 
