@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.2 2024-11-24
+
+### Other
+  * Updated dependencies to latest versions.
+
 ## v0.2.1 2024-09-16
 
 ### Other

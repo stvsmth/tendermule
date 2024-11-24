@@ -1,6 +1,6 @@
 [package]
 name = "tendermule"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 repository = "https://github.com/stvsmth/tendermule-rs"
 description = "Generate a possibly amusing random identifier"
@@ -9,9 +9,9 @@ license-file = "LICENSE"
 [dependencies]
 anyhow = "1.0"
 bincode = "1.3"
-clap-num = "1.0.2"
-clap = { version = "4.2.1", features = ["derive", "env"] }
-rand = "0.8.5"
+clap-num = "1.0"
+clap = { version = "4.2", features = ["derive", "env"] }
+rand = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0" }
 
