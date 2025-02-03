@@ -1,4 +1,4 @@
-![tender-mule-med](https://github.com/stvsmth/tendermule-rs/assets/3330805/d0410869-ce97-4446-b6bd-724232207bdd)
+![tender-mule-med](https://github.com/stvsmth/tendermule/assets/3330805/d0410869-ce97-4446-b6bd-724232207bdd)
 
 # tendermule
 
@@ -44,7 +44,7 @@ See `--help` for other options.
 ## Installation
 
 * You can install pre-built binaries from the [releases
-  page](https://github.com/stvsmth/tendermule-rs/releases/).
+  page](https://github.com/stvsmth/tendermule/releases/).
 * Alternatively, if you have a Rust toolchain installed you can clone this
   repo build with `cargo build --release`.
 
