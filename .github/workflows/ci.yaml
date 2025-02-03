@@ -54,6 +54,8 @@ jobs:
         with:
           target: ${{ matrix.job.target }}
 
+      - uses: Swatinem/rust-cache@v2
+
       - name: Install prerequisites
         shell: bash
         run: |
