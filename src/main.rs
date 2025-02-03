@@ -3,6 +3,8 @@ use clap_num::number_range;
 use std::collections::HashSet;
 use tendermule::{generate_ids, MAX_IDS_COUNT, MAX_ID_LENGTH, MIN_ID_LENGTH};
 
+// TODO: Currently our static adjs and nouns are read via main.rs and not the library code.
+// Consider moving the adjs and nouns to this library.
 mod words;
 use words::adjs;
 use words::nouns;

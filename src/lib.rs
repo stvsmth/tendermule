@@ -6,6 +6,9 @@ pub const MAX_IDS_COUNT: usize = 999_999;
 pub const MIN_ID_LENGTH: usize = 8;
 pub const MAX_ID_LENGTH: usize = 255;
 
+// TODO: Currently our static adjs and nouns are read via main.rs and not the library code.
+// Consider moving the adjs and nouns to this library.
+
 pub struct Config {
     pub prefix: String,
     pub suffix: String,
@@ -37,6 +40,14 @@ pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<Ha
     }
     if config.max_length > MAX_ID_LENGTH {
         return Err(anyhow!("Max length must be {} or less.", MAX_ID_LENGTH));
+    }
+
+    // Make sure we have some adjectives and nouns to work
+    if adjs.is_empty() {
+        return Err(anyhow!("No adjectives provided."));
+    }
+    if nouns.is_empty() {
+        return Err(anyhow!("No nouns provided."));
     }
 
     let distinct_ids_avail = adjs.len() * nouns.len();
@@ -154,5 +165,25 @@ mod tests {
     #[test]
     fn test_capitalize_first_char_special_chars() {
         assert_eq!(capitalize_first_char("!@#$"), "!@#$");
+    }
+
+    #[test]
+    fn test_empty_adjectives_passed() {
+        assert_eq!(
+            generate_ids(&[], &["mule"], &Config::default())
+                .unwrap_err()
+                .to_string(),
+            "No adjectives provided."
+        );
+    }
+
+    #[test]
+    fn test_empty_nouns_passed() {
+        assert_eq!(
+            generate_ids(&["tender"], &[], &Config::default())
+                .unwrap_err()
+                .to_string(),
+            "No nouns provided."
+        );
     }
 }
