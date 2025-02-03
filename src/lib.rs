@@ -82,10 +82,10 @@ pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<Ha
 
     // Randomly choose config.count number of ids from the precomputed list
     let mut random_ids = HashSet::with_capacity(config.count);
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     while random_ids.len() != config.count {
-        let random_index = rng.gen_range(0..uniq_ids.len());
+        let random_index = rng.random_range(0..uniq_ids.len());
         if let Some(id) = uniq_ids.get(random_index) {
             random_ids.insert(id.clone());
         }
