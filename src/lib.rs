@@ -19,14 +19,24 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Config {
-            prefix: String::from(""),
-            suffix: String::from(""),
+            prefix: String::new(),
+            suffix: String::new(),
             count: 1,
             max_length: 16,
         }
     }
 }
 
+/// Generate a set of unique IDs based on the given adjectives, nouns, and config.
+/// # Arguments
+/// * `adjs` - A slice of adjectives to use in the ID generation
+/// * `nouns` - A slice of nouns to use in the ID generation
+/// * `config` - A `Config` struct that contains the constraints for the ID generation
+///
+/// # Errors
+/// * Returns an when passed parameters do not meet the constraints
+/// * Returns an error when no unique IDs are available for the given constraints
+/// 
 pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<HashSet<String>> {
     // TODO: make this more dynamic
     if config.prefix.chars().count() > 5 {

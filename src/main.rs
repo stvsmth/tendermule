@@ -53,12 +53,12 @@ fn main() {
     if let Ok(results) = results {
         print_results(results);
     } else if let Err(e) = results {
-        eprintln!("Error: {}", e);
+        eprintln!("Error: {e}");
     }
 }
 
 fn print_results(results: HashSet<String>) {
     for result in results {
-        println!("{}", result);
+        println!("{result}");
     }
 }

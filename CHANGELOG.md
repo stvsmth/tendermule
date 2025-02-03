@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.3 2025-02-02
+
+### Other
+  * Updated dependencies, fix some trivial issues from Clippy.
+
 ## v0.2.2 2024-11-24
 
 ### Other

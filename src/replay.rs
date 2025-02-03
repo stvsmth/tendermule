@@ -31,7 +31,7 @@ fn main() {
     match read_json_file(file_path) {
         Ok(contents) => match parse_json::<FuzzData>(&contents) {
             Ok(fuzz_data) => {
-                println!("Parsed JSON: {:?}", fuzz_data);
+                println!("Parsed JSON: {fuzz_data:?}");
                 let args = vec![
                     "--prefix".to_string(),
                     fuzz_data.prefix,
@@ -43,7 +43,7 @@ fn main() {
                     fuzz_data.max_length.to_string(),
                 ];
 
-                println!("Running command: {:?}", args);
+                println!("Running command: {args:?}");
                 let output = Command::new("target/debug/tendermule")
                     .args(&args)
                     .output()
@@ -58,11 +58,11 @@ fn main() {
                 }
             }
             Err(err) => {
-                eprintln!("Failed to parse JSON: {}", err);
+                eprintln!("Failed to parse JSON: {err}");
             }
         },
         Err(err) => {
-            eprintln!("Failed to read file: {}", err);
+            eprintln!("Failed to read file: {err}");
         }
     }
 }
