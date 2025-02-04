@@ -3,6 +3,9 @@ name: CICD
 env:
   MIN_SUPPORTED_RUST_VERSION: "1.65.0"
   CICD_INTERMEDIATES_DIR: "_cicd-intermediates"
+  CARGO_PROFILE_TEST_DEBUG: 0
+  # Disable incremental compilation for faster from-scratch builds
+  CARGO_INCREMENTAL: 0
 
 on:
   workflow_dispatch:
