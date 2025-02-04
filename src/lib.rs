@@ -36,7 +36,7 @@ impl Default for Config {
 /// # Errors
 /// * Returns an when passed parameters do not meet the constraints
 /// * Returns an error when no unique IDs are available for the given constraints
-/// 
+///
 pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<HashSet<String>> {
     // TODO: make this more dynamic
     if config.prefix.chars().count() > 5 {
