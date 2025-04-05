@@ -1,7 +1,7 @@
 use clap::Parser;
 use clap_num::number_range;
 use std::collections::HashSet;
-use tendermule::{generate_ids, MAX_IDS_COUNT, MAX_ID_LENGTH, MIN_ID_LENGTH};
+use tendermule::{MAX_ID_LENGTH, MAX_IDS_COUNT, MIN_ID_LENGTH, generate_ids};
 
 // TODO: Currently our static adjs and nouns are read via main.rs and not the library code.
 // Consider moving the adjs and nouns to this library.
@@ -55,10 +55,15 @@ fn main() {
     };
 
     let results = generate_ids(adjs, nouns, &config);
-    if let Ok(results) = results {
-        print_results(results);
-    } else if let Err(e) = results {
-        eprintln!("Error: {e}");
+    match results {
+        Ok(results) => {
+            print_results(results);
+        }
+        _ => {
+            if let Err(e) = results {
+                eprintln!("Error: {e}");
+            }
+        }
     }
 }
 
