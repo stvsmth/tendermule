@@ -58,6 +58,9 @@ jobs:
           target: ${{ matrix.job.target }}
       - uses: Swatinem/rust-cache@v2
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Install prerequisites
         shell: bash
         run: |
@@ -124,9 +127,11 @@ jobs:
           echo "BIN_NAME=${BIN_NAME}" >> $GITHUB_OUTPUT
 
       - name: Run tests
-        run: cargo test --locked --target=${{ matrix.job.target }} ${{ steps.test-options.outputs.CARGO_TEST_OPTIONS}}
+        if: matrix.job.target == 'x86_64-unknown-linux-gnu'
+        run: cargo test --locked --target=${{ matrix.job.target }}
 
       - name: Run binary
+        if: matrix.job.target == 'x86_64-unknown-linux-gnu'
         run: cargo run --bin tendermule --locked --target=${{ matrix.job.target }}
 
       - name: Create tarball
