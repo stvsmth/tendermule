@@ -51,6 +51,7 @@ jobs:
           # - { target: i686-unknown-linux-musl, os: ubuntu-22.04 }
           # - { target: i686-pc-windows-msvc, os: windows-2019 }
           # - { target: x86_64-pc-windows-gnu, os: windows-2019 }
+
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
@@ -62,11 +63,14 @@ jobs:
         if: matrix.job.os != 'windows-2019'
         uses: docker/setup-qemu-action@v3
 
+      - name: Set linker for cross target
+        if: matrix.job.target == 'aarch64-unknown-linux-gnu'
+        run: echo "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc" >> $GITHUB_ENV
+
       - name: Install prerequisites
         shell: bash
         run: |
           case ${{ matrix.job.target }} in
-            arm-unknown-linux-*) sudo apt-get -y update ; sudo apt-get -y install gcc-arm-linux-gnueabihf ;;
             aarch64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install gcc-aarch64-linux-gnu ;;
           esac
 
