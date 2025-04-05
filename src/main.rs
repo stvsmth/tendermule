@@ -35,6 +35,10 @@ struct Args {
     /// Maximum length of the final identifier
     #[arg(short, long, env = "TMULE_MAX_LENGTH", default_value_t = 16, value_parser=valid_id_len)]
     max_length: usize,
+
+    /// Should we only consider adjective-noun pairs that start with the same letter
+    #[arg(short, long, env = "TMULE_ALLITERATE", default_value_t = false)]
+    alliterate: bool,
 }
 
 fn main() {
@@ -47,6 +51,7 @@ fn main() {
         suffix: args.suffix.clone(),
         count: args.count,
         max_length: args.max_length,
+        alliterate: args.alliterate,
     };
 
     let results = generate_ids(adjs, nouns, &config);

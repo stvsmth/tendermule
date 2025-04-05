@@ -6,10 +6,11 @@ fn test_no_valid_words_generates_err() {
     let nouns = vec!["elephants"];
 
     let config = Config {
-        prefix: String::from("stv"),
-        suffix: String::from(""),
+        alliterate: false,
         count: 1,
         max_length: 8,
+        prefix: String::from("stv"),
+        suffix: String::from(""),
     };
     let result = generate_ids(&adjs, &nouns, &config);
     assert!(result.is_err());
@@ -21,10 +22,11 @@ fn test_returns_minimal_set_of_ids() {
     let nouns = vec!["cat", "elephants"];
 
     let config = Config {
-        prefix: String::from(""),
-        suffix: String::from(""),
+        alliterate: false,
         count: 1,
         max_length: 8,
+        prefix: String::from(""),
+        suffix: String::from(""),
     };
     let result = generate_ids(&adjs, &nouns, &config).unwrap();
 
@@ -41,10 +43,11 @@ fn test_count_generates_unique_values() {
 
     for _ in 0..1000 {
         let config = Config {
-            prefix: String::from(""),
-            suffix: String::from(""),
+            alliterate: false,
             count: 2,
             max_length: 10,
+            prefix: String::from(""),
+            suffix: String::from(""),
         };
         let result = generate_ids(&adjs, &nouns, &config);
         let ids = result.unwrap();
@@ -69,10 +72,11 @@ fn test_fixes_check() {
     let adjs = vec!["blue", "gray"];
     let nouns = vec!["cat", "dog"];
     let mut config = Config {
-        prefix: String::from("123456"),
-        suffix: String::from(""),
+        alliterate: false,
         count: 1,
         max_length: 25,
+        prefix: String::from("123456"),
+        suffix: String::from(""),
     };
     let result = generate_ids(&adjs, &nouns, &config);
     assert!(result.is_err());
@@ -94,10 +98,11 @@ fn test_max_count_boundary() {
     let adjs = vec!["blue", "gray"];
     let nouns = vec!["cat", "dog"];
     let config = Config {
-        prefix: String::from(""),
-        suffix: String::from(""),
+        alliterate: false,
         count: 1_000_001,
         max_length: 16,
+        prefix: String::from(""),
+        suffix: String::from(""),
     };
     let result = generate_ids(&adjs, &nouns, &config);
     assert!(result.is_err());
@@ -114,10 +119,11 @@ fn test_max_length_check() {
     let adjs = vec!["blue", "gray"];
     let nouns = vec!["cat", "dog"];
     let mut config = Config {
-        prefix: String::from(""),
-        suffix: String::from(""),
+        alliterate: false,
         count: 2,
         max_length: 255,
+        prefix: String::from(""),
+        suffix: String::from(""),
     };
     let result = generate_ids(&adjs, &nouns, &config).unwrap();
     assert_eq!(result.len(), 2);
@@ -138,10 +144,11 @@ fn test_not_enough_unique_ids() {
     let adjs = vec!["blue", "gray"];
     let nouns = vec!["cat", "dog"];
     let config = Config {
-        prefix: String::from(""),
-        suffix: String::from(""),
+        alliterate: false,
         count: 9,
         max_length: 16,
+        prefix: String::from(""),
+        suffix: String::from(""),
     };
     let result = generate_ids(&adjs, &nouns, &config);
     assert!(result.is_err());
@@ -155,10 +162,11 @@ fn test_fixes_overwhelm() {
     let adjs = vec!["sly"];
     let nouns = vec!["cat"];
     let mut config = Config {
-        prefix: String::from("pref"),
-        suffix: String::from("suff"),
+        alliterate: false,
         count: 1,
         max_length: 14,
+        prefix: String::from("pref"),
+        suffix: String::from("suff"),
     };
     let result = generate_ids(&adjs, &nouns, &config).unwrap();
     assert_eq!(result.len(), 1);
@@ -180,10 +188,11 @@ fn test_handle_never_finds_small_enough_word() {
     let adjs = vec!["gray"];
     let nouns = vec!["cat", "dog", "elm", "eel"];
     let config = Config {
-        prefix: String::from(""),
-        suffix: String::from(""),
+        alliterate: false,
         count: 1,
         max_length: 6,
+        prefix: String::from(""),
+        suffix: String::from(""),
     };
     let result = generate_ids(&adjs, &nouns, &config);
     assert!(result.is_err());
@@ -200,11 +209,52 @@ fn test_did_not_generate_desired_count() {
     let adjs = vec!["sly", "fun", "blue", "gray"];
     let nouns = vec!["cat", "dog", "elephant", "mouse"];
     let config = Config {
-        prefix: String::from("12345"),
-        suffix: String::from("54321"),
+        alliterate: false,
         count: 10,
         max_length: 16,
+        prefix: String::from("12345"),
+        suffix: String::from("54321"),
     };
     let result = generate_ids(&adjs, &nouns, &config);
     assert!(result.is_err());
+}
+
+#[test]
+fn test_generates_alliteration() {
+    let adjs = vec!["sly", "fun", "blue", "gray"];
+    let nouns = vec!["shark", "dog", "elephant", "mouse"];
+    let config = Config {
+        alliterate: true,
+        count: 1,
+        max_length: 32,
+        prefix: String::from(""),
+        suffix: String::from(""),
+    };
+    let result = generate_ids(&adjs, &nouns, &config);
+    assert!(result.is_ok());
+    let ids = result.unwrap();
+    assert_eq!(ids.len(), 1);
+    let id_1 = ids.iter().next().unwrap();
+    assert_eq!(id_1, "SlyShark");
+}
+
+#[test]
+fn test_generates_no_alliteration() {
+    let adjs = vec!["sly", "fun", "blue", "gray"];
+    let nouns = vec!["mutt", "dog", "elephant", "mouse"];
+    let config = Config {
+        alliterate: true,
+        count: 1,
+        max_length: 32,
+        prefix: String::from(""),
+        suffix: String::from(""),
+    };
+    let result = generate_ids(&adjs, &nouns, &config);
+    assert!(result.is_err());
+    if let Err(e) = result {
+        assert_eq!(
+            format!("{}", e),
+            "No unique IDs available for the given constraints."
+        );
+    }
 }

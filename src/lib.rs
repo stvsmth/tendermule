@@ -10,10 +10,11 @@ pub const MAX_ID_LENGTH: usize = 255;
 // Consider moving the adjs and nouns to this library.
 
 pub struct Config {
-    pub prefix: String,
-    pub suffix: String,
     pub count: usize,
     pub max_length: usize,
+    pub prefix: String,
+    pub suffix: String,
+    pub alliterate: bool,
 }
 
 impl Default for Config {
@@ -23,6 +24,7 @@ impl Default for Config {
             suffix: String::new(),
             count: 1,
             max_length: 16,
+            alliterate: false,
         }
     }
 }
@@ -68,6 +70,9 @@ pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<Ha
         let adj = capitalize_first_char(adj);
         for noun in nouns {
             let noun = capitalize_first_char(noun);
+            if config.alliterate && adj.chars().next() != noun.chars().next() {
+                continue;
+            }
             let id = format!("{}{}{}{}", config.prefix, adj, noun, config.suffix);
             if id.len() <= config.max_length {
                 uniq_ids.push(id);
