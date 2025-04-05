@@ -39,15 +39,15 @@ jobs:
       fail-fast: false
       matrix:
         job:
+          - { target: x86_64-unknown-linux-gnu, os: ubuntu-22.04 }
+          - { target: x86_64-unknown-linux-musl, os: ubuntu-22.04 }
+          - { target: x86_64-pc-windows-msvc, os: windows-2019 }
           # - { target: aarch64-apple-darwin, os: macos-12 }  # Maybe mid- late-2023 https://github.com/actions/runner/issues/805
           # - { target: x86_64-apple-darwin, os: macos-10.15 }  # Research why no runner picks this up.
           # - { target: arm-unknown-linux-gnueabihf, os: ubuntu-22.04 }
           # - { target: arm-unknown-linux-musleabihf, os: ubuntu-22.04 }
           # - { target: i686-unknown-linux-gnu, os: ubuntu-22.04 }
           # - { target: aarch64-unknown-linux-gnu, os: ubuntu-22.04 }
-          - { target: x86_64-unknown-linux-gnu, os: ubuntu-22.04 }
-          - { target: x86_64-unknown-linux-musl, os: ubuntu-22.04 }
-          - { target: x86_64-pc-windows-msvc, os: windows-2019 }
           # - { target: i686-unknown-linux-musl, os: ubuntu-22.04 }
           # - { target: i686-pc-windows-msvc, os: windows-2019 }
           # - { target: x86_64-pc-windows-gnu, os: windows-2019 }
@@ -56,7 +56,6 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           target: ${{ matrix.job.target }}
-
       - uses: Swatinem/rust-cache@v2
 
       - name: Install prerequisites
