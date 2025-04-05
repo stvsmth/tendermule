@@ -60,7 +60,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
 
       - name: Set up QEMU
-        if: matrix.job.os != 'windows-2019'
+        if: runner.os == 'Linux'
         uses: docker/setup-qemu-action@v3
 
       - name: Set linker for cross target
