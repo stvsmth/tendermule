@@ -5,6 +5,7 @@ edition = "2021"
 repository = "https://github.com/stvsmth/tendermule"
 description = "Generate a possibly amusing random identifier"
 license-file = "LICENSE"
+default-run = "tendermule"
 
 [dependencies]
 anyhow = "1.0"
