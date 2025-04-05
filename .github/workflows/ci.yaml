@@ -139,7 +139,7 @@ jobs:
         if: matrix.job.target == 'x86_64-unknown-linux-gnu'
         run: cargo run --bin tendermule --locked --target=${{ matrix.job.target }}
 
-      - name: Create tarball
+      - name: Create package
         id: package
         shell: bash
         run: |
@@ -169,7 +169,7 @@ jobs:
           # Let subsequent steps know where to find the compressed package
           echo "PKG_PATH=${PKG_STAGING}/${PKG_NAME}" >> $GITHUB_OUTPUT
 
-      - name: "Artifact upload: tarball"
+      - name: Upload package
         uses: actions/upload-artifact@master
         with:
           name: ${{ steps.package.outputs.PKG_NAME }}
