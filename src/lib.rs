@@ -31,6 +31,7 @@ impl Default for Config {
 
 /// Count how many unique IDs are possible for the given adjectives, nouns, and config,
 /// without generating them. Respects `max_length`, `prefix`, `suffix`, and `alliterate`.
+#[must_use]
 pub fn count_available(adjs: &[&str], nouns: &[&str], config: &Config) -> usize {
     let prefix_len = config.prefix.chars().count();
     let suffix_len = config.suffix.chars().count();
