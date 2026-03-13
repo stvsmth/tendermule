@@ -82,3 +82,29 @@ fn print_results(results: HashSet<String>) {
         println!("{result}");
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tendermule::Config;
+
+    /// These values are documented in README.md. If this test fails because the word lists
+    /// changed, update the `--available` example in README.md to match the new counts.
+    #[test]
+    fn test_available_counts_match_readme() {
+        let adjs = adjs::ADJS;
+        let nouns = nouns::NOUNS;
+        for (max_length, expected) in [(8, 20_130_usize), (12, 213_278), (16, 300_362)] {
+            let config = Config {
+                max_length,
+                ..Config::default()
+            };
+            let actual = count_available(adjs, nouns, &config);
+            assert_eq!(
+                actual, expected,
+                "Available count for --max-length {max_length} is now {actual} but README documents \
+                 {expected}. Update the --available example in README.md."
+            );
+        }
+    }
+}

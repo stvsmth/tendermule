@@ -39,6 +39,18 @@ stvHuskyCentaur
 stvElderlyBoar
 ```
 
+Check how many unique identifiers are possible at a given max length:
+```
+$ tendermule --available --max-length 8
+20130
+
+$ tendermule --available --max-length 12
+213278
+
+$ tendermule --available --max-length 16
+300362
+```
+
 See `--help` for other options.
 
 ## Installation
