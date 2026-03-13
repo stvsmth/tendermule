@@ -3,9 +3,10 @@ name: CICD
 env:
   MIN_SUPPORTED_RUST_VERSION: "1.85.0"
   CICD_INTERMEDIATES_DIR: "_cicd-intermediates"
-  CARGO_PROFILE_TEST_DEBUG: 0
-  # Disable incremental compilation for faster from-scratch builds
   CARGO_INCREMENTAL: 0
+
+permissions:
+  contents: read
 
 on:
   workflow_dispatch:
@@ -14,17 +15,18 @@ on:
     branches:
       - main
     tags:
-      - "*"
+      - "v*"
 
 jobs:
   code_checks:
     name: Run formatter, clippy, tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy,rustfmt
+      - uses: Swatinem/rust-cache@v2
       - name: Run formatter
         run: cargo fmt --all -- --check
       - name: Run clippy
@@ -32,150 +34,111 @@ jobs:
       - name: Run tests
         run: cargo test --locked
 
+  msrv:
+    name: Check MSRV (1.85.0)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.MIN_SUPPORTED_RUST_VERSION }}
+      - uses: Swatinem/rust-cache@v2
+      - name: Build on MSRV
+        run: cargo build --locked --all-targets --all-features
+
   build:
     name: ${{ matrix.job.target }} (${{ matrix.job.os }})
+    needs: code_checks
     runs-on: ${{ matrix.job.os }}
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
         job:
-          - { target: aarch64-apple-darwin, os: macos-14 }
-          - { target: aarch64-unknown-linux-gnu, os: ubuntu-22.04 }
-          - { target: x86_64-pc-windows-msvc, os: windows-2019 }
-          - { target: x86_64-unknown-linux-gnu, os: ubuntu-22.04 }
-          - { target: x86_64-unknown-linux-musl, os: ubuntu-22.04 }
-          # - { target: arm-unknown-linux-gnueabihf, os: ubuntu-22.04 }
-          # - { target: arm-unknown-linux-musleabihf, os: ubuntu-22.04 }
-          # - { target: i686-unknown-linux-gnu, os: ubuntu-22.04 }
-          # - { target: i686-unknown-linux-musl, os: ubuntu-22.04 }
-          # - { target: i686-pc-windows-msvc, os: windows-2019 }
-          # - { target: x86_64-pc-windows-gnu, os: windows-2019 }
+          - { target: aarch64-apple-darwin,       os: macos-14     }
+          - { target: aarch64-unknown-linux-gnu,   os: ubuntu-24.04 }
+          - { target: x86_64-pc-windows-msvc,      os: windows-2022 }
+          - { target: x86_64-unknown-linux-gnu,    os: ubuntu-24.04 }
+          - { target: x86_64-unknown-linux-musl,   os: ubuntu-24.04 }
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
           target: ${{ matrix.job.target }}
       - uses: Swatinem/rust-cache@v2
 
-      - name: Set up QEMU
-        if: runner.os == 'Linux'
-        uses: docker/setup-qemu-action@v3
+      - name: Install cross-compilation prerequisites
+        if: matrix.job.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get -y update
+          sudo apt-get -y install gcc-aarch64-linux-gnu
 
       - name: Set linker for cross target
         if: matrix.job.target == 'aarch64-unknown-linux-gnu'
         run: echo "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc" >> $GITHUB_ENV
 
-      - name: Install prerequisites
-        shell: bash
-        run: |
-          case ${{ matrix.job.target }} in
-            aarch64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install gcc-aarch64-linux-gnu ;;
-          esac
-
       - name: Extract crate information
         shell: bash
         run: |
-          echo "PROJECT_NAME=$(sed -n 's/^name = "\(.*\)"/\1/p' Cargo.toml | head -n1)" >> $GITHUB_ENV
-          echo "PROJECT_VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n1)" >> $GITHUB_ENV
-          echo "PROJECT_MAINTAINER=$(sed -n 's/^authors = \["\(.*\)"\]/\1/p' Cargo.toml)" >> $GITHUB_ENV
-          echo "PROJECT_HOMEPAGE=$(sed -n 's/^homepage = "\(.*\)"/\1/p' Cargo.toml)" >> $GITHUB_ENV
-
-      - name: Show version information (Rust, cargo, GCC)
-        shell: bash
-        run: |
-          gcc --version || true
-          rustup -V
-          rustup toolchain list
-          rustup default
-          cargo -V
-          rustc -V
+          echo "PROJECT_NAME=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].name')" >> $GITHUB_ENV
+          echo "PROJECT_VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')" >> $GITHUB_ENV
 
       - name: Build
         run: cargo build --locked --release --target=${{ matrix.job.target }}
 
-      - name: Strip debug information from executable
-        id: strip
+      - name: Strip and package
+        id: package
         shell: bash
         run: |
-          # Figure out suffix of binary
-          EXE_suffix=""
+          EXE_SUFFIX=""
           case ${{ matrix.job.target }} in
-            *-pc-windows-*) EXE_suffix=".exe" ;;
-          esac;
+            *-pc-windows-*) EXE_SUFFIX=".exe" ;;
+          esac
 
-          # Figure out what strip tool to use if any
           STRIP="strip"
           case ${{ matrix.job.target }} in
-            arm-unknown-linux-*) STRIP="arm-linux-gnueabihf-strip" ;;
             aarch64-unknown-linux-gnu) STRIP="aarch64-linux-gnu-strip" ;;
-            *-pc-windows-msvc) STRIP="" ;;
-          esac;
+            *-pc-windows-msvc)         STRIP="" ;;
+          esac
 
-          # Setup paths
-          BIN_DIR="${{ env.CICD_INTERMEDIATES_DIR }}/stripped-release-bin/"
-          mkdir -p "${BIN_DIR}"
-          BIN_NAME="${{ env.PROJECT_NAME }}${EXE_suffix}"
-          BIN_PATH="${BIN_DIR}/${BIN_NAME}"
+          BIN_NAME="${PROJECT_NAME}${EXE_SUFFIX}"
+          BIN_PATH="target/${{ matrix.job.target }}/release/${BIN_NAME}"
 
-          # Copy the release build binary to the result location
-          cp "target/${{ matrix.job.target }}/release/${BIN_NAME}" "${BIN_DIR}"
-
-          # Also strip if possible
           if [ -n "${STRIP}" ]; then
             "${STRIP}" "${BIN_PATH}"
           fi
 
-          # Let subsequent steps know where to find the (stripped) bin
-          echo "BIN_PATH=${BIN_PATH}" >> $GITHUB_OUTPUT
-          echo "BIN_NAME=${BIN_NAME}" >> $GITHUB_OUTPUT
+          PKG_NAME="${PROJECT_NAME}-v${PROJECT_VERSION}-${{ matrix.job.target }}"
+          STAGING="${{ env.CICD_INTERMEDIATES_DIR }}/${PKG_NAME}"
+          mkdir -p "${STAGING}"
+          cp "${BIN_PATH}" README.md LICENSE CHANGELOG.md "${STAGING}/"
 
-      - name: Run tests
-        if: matrix.job.target == 'x86_64-unknown-linux-gnu'
-        run: cargo test --locked --target=${{ matrix.job.target }}
+          case ${{ matrix.job.target }} in
+            *-pc-windows-*)
+              PKG_FILE="${PKG_NAME}.zip"
+              (cd "${{ env.CICD_INTERMEDIATES_DIR }}" && 7z a "${PKG_FILE}" "${PKG_NAME}/")
+              ;;
+            *)
+              PKG_FILE="${PKG_NAME}.tar.gz"
+              (cd "${{ env.CICD_INTERMEDIATES_DIR }}" && tar czf "${PKG_FILE}" "${PKG_NAME}/")
+              ;;
+          esac
 
-      - name: Run binary
-        if: matrix.job.target == 'x86_64-unknown-linux-gnu'
-        run: cargo run --bin tendermule --locked --target=${{ matrix.job.target }}
-
-      - name: Create package
-        id: package
-        shell: bash
-        run: |
-          PKG_NAME=${PROJECT_NAME}-v${PROJECT_VERSION}-${{ matrix.job.target }}
+          echo "PKG_FILE=${{ env.CICD_INTERMEDIATES_DIR }}/${PKG_FILE}" >> $GITHUB_OUTPUT
           echo "PKG_NAME=${PKG_NAME}" >> $GITHUB_OUTPUT
 
-          PKG_STAGING="${{ env.CICD_INTERMEDIATES_DIR }}/package"
-          ARCHIVE_DIR="${PKG_STAGING}/${PKG_NAME}/"
-          mkdir -p "${ARCHIVE_DIR}"
-
-          # Binary
-          cp "${{ steps.strip.outputs.BIN_PATH }}" "$ARCHIVE_DIR"
-
-          # README, LICENSE and CHANGELOG files
-          cp "README.md" "LICENSE" "CHANGELOG.md" "$ARCHIVE_DIR"
-
-          # Let subsequent steps know where to find the compressed package
-          echo "PKG_PATH=${PKG_STAGING}/${PKG_NAME}" >> $GITHUB_OUTPUT
-
-      - name: Upload package
-        uses: actions/upload-artifact@master
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.package.outputs.PKG_NAME }}
-          path: ${{ steps.package.outputs.PKG_PATH }}
+          path: ${{ steps.package.outputs.PKG_FILE }}
 
-      - name: Check for release
-        id: is-release
-        shell: bash
-        run: |
-          unset IS_RELEASE ; if [[ $GITHUB_REF =~ ^refs/tags/v[0-9].* ]]; then IS_RELEASE='true' ; fi
-          echo "IS_RELEASE=${IS_RELEASE}" >> $GITHUB_OUTPUT
-
-      - name: Publish archives and packages
-        uses: softprops/action-gh-release@v1
-        if: steps.is-release.outputs.IS_RELEASE
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/v')
         with:
-          files: |
-            ${{ steps.package.outputs.PKG_PATH }}
+          files: ${{ steps.package.outputs.PKG_FILE }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
