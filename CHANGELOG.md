@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.3.0 2026-03-12
+
+### Added
+  * `--available` flag (and `TMULE_AVAILABLE` env var) prints the count of unique identifiers
+    possible for the current configuration and exits. Respects `--prefix`, `--suffix`,
+    `--max-length`, and `--alliterate`. Conflicts with `--count`.
+  * `count_available()` library function exposes the same logic for programmatic use.
+
 ## v0.2.3 2025-02-02
 
 ### Other

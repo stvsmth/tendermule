@@ -1,7 +1,7 @@
 use clap::Parser;
 use clap_num::number_range;
 use std::collections::HashSet;
-use tendermule::{MAX_ID_LENGTH, MAX_IDS_COUNT, MIN_ID_LENGTH, generate_ids};
+use tendermule::{MAX_ID_LENGTH, MAX_IDS_COUNT, MIN_ID_LENGTH, count_available, generate_ids};
 
 // TODO: Currently our static adjs and nouns are read via main.rs and not the library code.
 // Consider moving the adjs and nouns to this library.
@@ -39,6 +39,10 @@ struct Args {
     /// Should we only consider adjective-noun pairs that start with the same letter
     #[arg(short, long, env = "TMULE_ALLITERATE", default_value_t = false)]
     alliterate: bool,
+
+    /// Print the number of unique identifiers available for the current configuration and exit
+    #[arg(long, env = "TMULE_AVAILABLE", conflicts_with = "count")]
+    available: bool,
 }
 
 fn main() {
@@ -53,6 +57,12 @@ fn main() {
         max_length: args.max_length,
         alliterate: args.alliterate,
     };
+
+    if args.available {
+        let n = count_available(adjs, nouns, &config);
+        println!("{n}");
+        return;
+    }
 
     let results = generate_ids(adjs, nouns, &config);
     match results {

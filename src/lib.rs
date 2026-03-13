@@ -29,6 +29,29 @@ impl Default for Config {
     }
 }
 
+/// Count how many unique IDs are possible for the given adjectives, nouns, and config,
+/// without generating them. Respects `max_length`, `prefix`, `suffix`, and `alliterate`.
+pub fn count_available(adjs: &[&str], nouns: &[&str], config: &Config) -> usize {
+    let prefix_len = config.prefix.chars().count();
+    let suffix_len = config.suffix.chars().count();
+    let mut count = 0;
+    for adj in adjs {
+        let adj = capitalize_first_char(adj);
+        let adj_first = adj.chars().next();
+        let adj_len = adj.chars().count();
+        for noun in nouns {
+            let noun = capitalize_first_char(noun);
+            if config.alliterate && adj_first != noun.chars().next() {
+                continue;
+            }
+            if prefix_len + adj_len + noun.chars().count() + suffix_len <= config.max_length {
+                count += 1;
+            }
+        }
+    }
+    count
+}
+
 /// Generate a set of unique IDs based on the given adjectives, nouns, and config.
 /// # Arguments
 /// * `adjs` - A slice of adjectives to use in the ID generation
