@@ -48,10 +48,10 @@ pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<Ha
         return Err(anyhow!("Suffix must be 5 characters or less."));
     }
     if config.count > MAX_IDS_COUNT {
-        return Err(anyhow!("Count must be {} or less.", MAX_IDS_COUNT));
+        return Err(anyhow!("Count must be {MAX_IDS_COUNT} or less."));
     }
     if config.max_length > MAX_ID_LENGTH {
-        return Err(anyhow!("Max length must be {} or less.", MAX_ID_LENGTH));
+        return Err(anyhow!("Max length must be {MAX_ID_LENGTH} or less."));
     }
 
     // Make sure we have some adjectives and nouns to work

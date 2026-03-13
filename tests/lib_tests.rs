@@ -10,7 +10,7 @@ fn test_no_valid_words_generates_err() {
         count: 1,
         max_length: 8,
         prefix: String::from("stv"),
-        suffix: String::from(""),
+        suffix: String::new(),
     };
     let result = generate_ids(&adjs, &nouns, &config);
     assert!(result.is_err());
@@ -25,8 +25,8 @@ fn test_returns_minimal_set_of_ids() {
         alliterate: false,
         count: 1,
         max_length: 8,
-        prefix: String::from(""),
-        suffix: String::from(""),
+        prefix: String::new(),
+        suffix: String::new(),
     };
     let result = generate_ids(&adjs, &nouns, &config).unwrap();
 
@@ -46,8 +46,8 @@ fn test_count_generates_unique_values() {
             alliterate: false,
             count: 2,
             max_length: 10,
-            prefix: String::from(""),
-            suffix: String::from(""),
+            prefix: String::new(),
+            suffix: String::new(),
         };
         let result = generate_ids(&adjs, &nouns, &config);
         let ids = result.unwrap();
@@ -76,21 +76,21 @@ fn test_fixes_check() {
         count: 1,
         max_length: 25,
         prefix: String::from("123456"),
-        suffix: String::from(""),
+        suffix: String::new(),
     };
     let result = generate_ids(&adjs, &nouns, &config);
     assert!(result.is_err());
 
     if let Err(e) = result {
-        assert_eq!(format!("{}", e), "Prefix must be 5 characters or less.");
+        assert_eq!(format!("{e}"), "Prefix must be 5 characters or less.");
     }
-    config.prefix = String::from("");
+    config.prefix = String::new();
     config.suffix = String::from("123456");
     let result = generate_ids(&adjs, &nouns, &config);
     assert!(result.is_err());
 
     if let Err(e) = result {
-        assert_eq!(format!("{}", e), "Suffix must be 5 characters or less.");
+        assert_eq!(format!("{e}"), "Suffix must be 5 characters or less.");
     }
 }
 #[test]
@@ -101,14 +101,14 @@ fn test_max_count_boundary() {
         alliterate: false,
         count: 1_000_001,
         max_length: 16,
-        prefix: String::from(""),
-        suffix: String::from(""),
+        prefix: String::new(),
+        suffix: String::new(),
     };
     let result = generate_ids(&adjs, &nouns, &config);
     assert!(result.is_err());
     if let Err(e) = result {
         assert_eq!(
-            format!("{}", e),
+            format!("{e}"),
             format!("Count must be {} or less.", MAX_IDS_COUNT),
         );
     }
@@ -122,8 +122,8 @@ fn test_max_length_check() {
         alliterate: false,
         count: 2,
         max_length: 255,
-        prefix: String::from(""),
-        suffix: String::from(""),
+        prefix: String::new(),
+        suffix: String::new(),
     };
     let result = generate_ids(&adjs, &nouns, &config).unwrap();
     assert_eq!(result.len(), 2);
@@ -133,7 +133,7 @@ fn test_max_length_check() {
     assert!(result.is_err());
     if let Err(e) = result {
         assert_eq!(
-            format!("{}", e),
+            format!("{e}"),
             format!("Max length must be {} or less.", MAX_ID_LENGTH),
         );
     }
@@ -147,13 +147,13 @@ fn test_not_enough_unique_ids() {
         alliterate: false,
         count: 9,
         max_length: 16,
-        prefix: String::from(""),
-        suffix: String::from(""),
+        prefix: String::new(),
+        suffix: String::new(),
     };
     let result = generate_ids(&adjs, &nouns, &config);
     assert!(result.is_err());
     if let Err(e) = result {
-        assert_eq!(format!("{}", e), "Only 4 IDs available, cannot produce 9.");
+        assert_eq!(format!("{e}"), "Only 4 IDs available, cannot produce 9.");
     }
 }
 
@@ -177,7 +177,7 @@ fn test_fixes_overwhelm() {
     let result = generate_ids(&adjs, &nouns, &config);
     if let Err(e) = result {
         assert_eq!(
-            format!("{}", e),
+            format!("{e}"),
             "No unique IDs available for the given constraints."
         );
     }
@@ -191,14 +191,14 @@ fn test_handle_never_finds_small_enough_word() {
         alliterate: false,
         count: 1,
         max_length: 6,
-        prefix: String::from(""),
-        suffix: String::from(""),
+        prefix: String::new(),
+        suffix: String::new(),
     };
     let result = generate_ids(&adjs, &nouns, &config);
     assert!(result.is_err());
     if let Err(e) = result {
         assert_eq!(
-            format!("{}", e),
+            format!("{e}"),
             "No unique IDs available for the given constraints."
         );
     }
@@ -227,8 +227,8 @@ fn test_generates_alliteration() {
         alliterate: true,
         count: 1,
         max_length: 32,
-        prefix: String::from(""),
-        suffix: String::from(""),
+        prefix: String::new(),
+        suffix: String::new(),
     };
     let result = generate_ids(&adjs, &nouns, &config);
     assert!(result.is_ok());
@@ -246,14 +246,14 @@ fn test_generates_no_alliteration() {
         alliterate: true,
         count: 1,
         max_length: 32,
-        prefix: String::from(""),
-        suffix: String::from(""),
+        prefix: String::new(),
+        suffix: String::new(),
     };
     let result = generate_ids(&adjs, &nouns, &config);
     assert!(result.is_err());
     if let Err(e) = result {
         assert_eq!(
-            format!("{}", e),
+            format!("{e}"),
             "No unique IDs available for the given constraints."
         );
     }
