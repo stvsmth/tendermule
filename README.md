@@ -2,20 +2,23 @@
 
 # tendermule
 
-`tendermule` is a simple utility that generates unique identifiers with some constraints. Why the quirky name? 
-Well, I generated a couple dozen names using this tool and `TenderMule` spoke to me.
+`tendermule` is a simple utility that generates unique identifiers with some
+constraints. Why the quirky name? Well, I generated a couple dozen names using this tool
+and `TenderMule` spoke to me.
 
-This tool exists because I was automating a task that needed a unique identifier less than 16
-characters. Over the course of my work, I would have more than a dozen such identifiers, and I
-wanted something more memorable than `MyTask-1234`. I also wanted a customizable prefix, so I could
-group my tasks together, as well as alert others on the team that these were my tasks.
+This tool exists because I was automating a task that needed a unique identifier less
+than 16 characters. Over the course of my work, I would have more than a dozen such
+identifiers, and I wanted something more memorable than `MyTask-1234`. I also wanted a
+customizable prefix, so I could group my tasks together, as well as alert others on the
+team that these were my tasks.
 
-This started as a Python project, but I moved it to Rust so that I could distribute it as a
-self-contained binary (or even an embedded library).
+This started as a Python project, but I moved it to Rust so that I could distribute it
+as a self-contained binary (or even an embedded library).
 
-Currently, each identifier will always be in the form of `AdjectiveNoun`, and will always have the
-first letter of each word capitalized (camel case). You can supply a prefix or suffix of up to five
-characters; we honor the case of the prefix and suffix inputs.
+Currently, each identifier will always be in the form of `AdjectiveNoun`, and will
+always have the first letter of each word capitalized (camel case). You can supply a
+prefix or suffix of up to five characters; we honor the case of the prefix and suffix
+inputs.
 
 You may request more than one identifier. The results are guaranteed to be unique;
 however, your combination of maximum length, prefix, and suffix could result in limited
@@ -24,13 +27,15 @@ however, your combination of maximum length, prefix, and suffix could result in 
 ## Usage
 
 Generate one unique identifier:
-```
+
+```bash
 $ tendermule
 WastefulGuppy
 ```
 
-Generate 4 unique identifiers, with a prefix
-```
+Generate 5 unique identifiers, with a prefix
+
+```bash
 $ tendermule --prefix stv --count 5
 stvCurvyDancer
 stvSteadyDiamond
@@ -40,15 +45,17 @@ stvElderlyBoar
 ```
 
 Check how many unique identifiers are possible at a given max length:
-```
+
+```bash
 $ tendermule --available --max-length 8
 20130
 
-$ tendermule --available --max-length 12
-213278
-
 $ tendermule --available --max-length 16
 300362
+
+# This is aware of options like --prefix
+$ tendermule --available --max-length 16 --prefix stv
+258453
 ```
 
 See `--help` for other options.
@@ -57,9 +64,12 @@ See `--help` for other options.
 
 * You can install pre-built binaries from the [releases
   page](https://github.com/stvsmth/tendermule/releases/).
-* Alternatively, if you have a Rust toolchain installed you can clone this
-  repo build with `cargo build --release`.
+* Alternatively, if you have a Rust toolchain installed you can clone this repo build
+  with
 
+  ```bash
+  cargo build --release
+  ```
 
 ## Can I ...
 
