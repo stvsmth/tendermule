@@ -74,7 +74,7 @@ pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<Ha
                 continue;
             }
             let id = format!("{}{}{}{}", config.prefix, adj, noun, config.suffix);
-            if id.len() <= config.max_length {
+            if id.chars().count() <= config.max_length {
                 uniq_ids.push(id);
             }
         }
