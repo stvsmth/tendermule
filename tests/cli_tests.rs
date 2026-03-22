@@ -13,10 +13,7 @@ fn test_success_exits_zero() {
 #[test]
 fn test_error_exits_nonzero() {
     // Prefix longer than 5 chars triggers a generate_ids error
-    let status = tendermule()
-        .args(["--prefix", "toolong"])
-        .status()
-        .unwrap();
+    let status = tendermule().args(["--prefix", "toolong"]).status().unwrap();
     assert!(!status.success());
     assert_eq!(status.code(), Some(1));
 }

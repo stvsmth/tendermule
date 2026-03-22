@@ -112,11 +112,11 @@ pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<Ha
     }
     // ... or not enough unique IDs to satisfy the request
     if uniq_ids.len() < config.count {
-        return Err(anyhow!(format!(
+        return Err(anyhow!(
             "Only {} IDs available, cannot produce {}.",
             uniq_ids.len(),
             config.count
-        )));
+        ));
     }
 
     // Randomly choose config.count number of ids from the precomputed list
