@@ -66,13 +66,10 @@ fn main() {
 
     let results = generate_ids(adjs, nouns, &config);
     match results {
-        Ok(results) => {
-            print_results(results);
-        }
-        _ => {
-            if let Err(e) = results {
-                eprintln!("Error: {e}");
-            }
+        Ok(ids) => print_results(ids),
+        Err(e) => {
+            eprintln!("Error: {e}");
+            std::process::exit(1);
         }
     }
 }
