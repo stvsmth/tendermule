@@ -91,7 +91,7 @@ mod tests {
     fn test_available_counts_match_readme() {
         let adjs = adjs::ADJS;
         let nouns = nouns::NOUNS;
-        for (max_length, expected) in [(8, 20_130_usize), (12, 213_278), (16, 300_362)] {
+        for (max_length, expected) in [(8, 48_029_usize), (12, 460_233), (16, 633_840)] {
             let config = Config {
                 max_length,
                 ..Config::default()
