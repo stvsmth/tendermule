@@ -4,6 +4,7 @@ env:
   MIN_SUPPORTED_RUST_VERSION: "1.85.0"
   CICD_INTERMEDIATES_DIR: "_cicd-intermediates"
   CARGO_INCREMENTAL: 0
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
   contents: read
@@ -22,7 +23,7 @@ jobs:
     name: Run formatter, clippy, tests
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy,rustfmt
@@ -38,7 +39,7 @@ jobs:
     name: Check MSRV (1.85.0)
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ env.MIN_SUPPORTED_RUST_VERSION }}
@@ -63,7 +64,7 @@ jobs:
           - { target: x86_64-unknown-linux-musl,   os: ubuntu-24.04 }
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
         with:
           target: ${{ matrix.job.target }}
@@ -130,7 +131,7 @@ jobs:
           echo "PKG_NAME=${PKG_NAME}" >> $GITHUB_OUTPUT
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ steps.package.outputs.PKG_NAME }}
           path: ${{ steps.package.outputs.PKG_FILE }}
