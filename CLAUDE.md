@@ -1,7 +1,3 @@
-# CLAUDE.md
-
-This file provides guidance to LLM Agents when working with code in this repository.
-
 ## Project Overview
 
 **tendermule** is a Rust CLI utility and library that generates unique, memorable random
@@ -54,9 +50,24 @@ prefix/suffix) → optionally filter for alliteration → randomly sample withou
 
 The CI pipeline (`.github/workflows/ci.yaml`) runs:
 1. `code_checks`: fmt, clippy, tests on ubuntu
-2. `build`: cross-compile for `aarch64-apple-darwin`, `aarch64-unknown-linux-gnu`,
+2. `msrv`: verifies the crate builds on the minimum supported Rust version
+3. `build`: cross-compile for `aarch64-apple-darwin`, `aarch64-unknown-linux-gnu`,
    `x86_64-pc-windows-msvc`, `x86_64-unknown-linux-gnu`, `x86_64-unknown-linux-musl`
 
 Version tags matching `v*` trigger GitHub Releases with packaged binaries.
 
 MSRV: **1.85.0** (Rust 2024 edition)
+
+## Releasing
+
+```bash
+# 1. Tag the release and push the tag to trigger CI
+git tag v0.X.Y
+git push origin v0.X.Y
+
+# 2. CI builds all targets and creates the GitHub Release automatically.
+#    After CI completes, add release notes:
+gh release edit v0.X.Y --notes "* ...release notes...
+
+**Full Changelog**: https://github.com/stvsmth/tendermule/compare/vPREVIOUS...v0.X.Y"
+```
