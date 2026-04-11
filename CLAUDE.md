@@ -25,8 +25,22 @@ cargo fmt --all
 # Run a specific test
 cargo test <test_name>
 
+# Audit dependencies for vulnerabilities
+cargo audit
+
+# Vet dependencies for supply-chain review
+cargo vet
+
 # Run the binary
 ./target/release/tendermule --prefix stv --count 5
+```
+
+## Development Setup
+
+After cloning, enable the pre-commit hook (runs fmt, clippy, tests, and vet):
+
+```bash
+git config core.hooksPath hooks
 ```
 
 ## Architecture
@@ -49,12 +63,15 @@ prefix/suffix) → optionally filter for alliteration → randomly sample withou
 ## CI
 
 The CI pipeline (`.github/workflows/ci.yaml`) runs:
-1. `code_checks`: fmt, clippy, tests on ubuntu
+1. `code_checks`: fmt, clippy, tests, vet on ubuntu
 2. `msrv`: verifies the crate builds on the minimum supported Rust version
 3. `build`: cross-compile for `aarch64-apple-darwin`, `aarch64-unknown-linux-gnu`,
    `x86_64-pc-windows-msvc`, `x86_64-unknown-linux-gnu`, `x86_64-unknown-linux-musl`
 
 Version tags matching `v*` trigger GitHub Releases with packaged binaries.
+
+A separate weekly workflow (`.github/workflows/audit.yaml`) runs `cargo audit` to check for
+dependency vulnerabilities without blocking CI on unrelated PRs.
 
 MSRV: **1.85.0** (Rust 2024 edition)
 

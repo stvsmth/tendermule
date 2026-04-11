@@ -71,6 +71,14 @@ See `--help` for other options.
   cargo build --release
   ```
 
+## Development
+
+After cloning, enable the pre-commit hook (runs fmt, clippy, tests, and vet):
+
+```bash
+git config core.hooksPath hooks
+```
+
 ## Can I ...
 
 * Pass in my own list of adjectives and nouns?

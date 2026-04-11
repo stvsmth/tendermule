@@ -8,7 +8,7 @@ license-file = "LICENSE"
 default-run = "tendermule"
 
 [lints.clippy]
-pedantic = "deny"
+pedantic = { level = "deny", priority = -1 }
 
 [dependencies]
 anyhow = "1.0"

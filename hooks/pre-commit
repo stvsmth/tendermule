@@ -1,0 +1,18 @@
+#!/bin/sh
+set -e
+
+echo "Running pre-commit checks..."
+
+echo "  fmt"
+cargo fmt --all -- --check
+
+echo "  clippy"
+cargo clippy --locked --all-targets --all-features -- -D warnings
+
+echo "  tests"
+cargo test --locked
+
+echo "  vet"
+cargo vet
+
+echo "All checks passed."
