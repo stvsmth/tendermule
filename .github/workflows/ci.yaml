@@ -34,7 +34,9 @@ jobs:
         run: cargo clippy --locked --all-targets --all-features -- -D warnings
       - name: Run tests
         run: cargo test --locked
-      - uses: taiki-e/install-action@cargo-vet
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-vet
       - name: Run vet
         run: cargo vet
 
