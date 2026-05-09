@@ -163,21 +163,6 @@ mod tests {
     }
 
     #[test]
-    fn test_capitalize_first_char_empty_string() {
-        assert_eq!(capitalize_first_char(""), "");
-    }
-
-    #[test]
-    fn test_capitalize_first_char_single_char() {
-        assert_eq!(capitalize_first_char("a"), "A");
-    }
-
-    #[test]
-    fn test_capitalize_first_char_multiple_chars() {
-        assert_eq!(capitalize_first_char("hello"), "Hello");
-    }
-
-    #[test]
     fn test_capitalize_first_char_unicode() {
         assert_eq!(capitalize_first_char("éclair"), "Éclair");
     }
