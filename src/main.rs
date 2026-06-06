@@ -1,13 +1,9 @@
 use clap::Parser;
 use clap_num::number_range;
 use std::collections::HashSet;
-use tendermule::{MAX_ID_LENGTH, MAX_IDS_COUNT, MIN_ID_LENGTH, count_available, generate_ids};
-
-// TODO: Currently our static adjs and nouns are read via main.rs and not the library code.
-// Consider moving the adjs and nouns to this library.
-mod words;
-use words::adjs;
-use words::nouns;
+use tendermule::{
+    MAX_ID_LENGTH, MAX_IDS_COUNT, MIN_ID_LENGTH, count_available_default, generate_ids_default,
+};
 
 fn valid_max_count(s: &str) -> Result<usize, String> {
     number_range(s, 1, MAX_IDS_COUNT)
@@ -48,8 +44,6 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    let adjs = adjs::ADJS;
-    let nouns = nouns::NOUNS;
     let config = tendermule::Config {
         prefix: args.prefix.clone(),
         suffix: args.suffix.clone(),
@@ -59,12 +53,12 @@ fn main() {
     };
 
     if args.available {
-        let n = count_available(adjs, nouns, &config);
+        let n = count_available_default(&config);
         println!("{n}");
         return;
     }
 
-    let results = generate_ids(adjs, nouns, &config);
+    let results = generate_ids_default(&config);
     match results {
         Ok(ids) => print_results(ids),
         Err(e) => {
@@ -89,14 +83,12 @@ mod tests {
     /// changed, update the `--available` example in README.md to match the new counts.
     #[test]
     fn test_available_counts_match_readme() {
-        let adjs = adjs::ADJS;
-        let nouns = nouns::NOUNS;
         for (max_length, expected) in [(8, 48_029_usize), (12, 460_233), (16, 633_840)] {
             let config = Config {
                 max_length,
                 ..Config::default()
             };
-            let actual = count_available(adjs, nouns, &config);
+            let actual = count_available_default(&config);
             assert_eq!(
                 actual, expected,
                 "Available count for --max-length {max_length} is now {actual} but README documents \

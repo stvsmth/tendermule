@@ -10,6 +10,9 @@ identifiers in `AdjectiveNoun` format (e.g., "WastefulGuppy", "CurvyDancer"). Id
 # Build
 cargo build --release
 
+# Build the library alone, without CLI dependencies
+cargo build --no-default-features
+
 # Run all tests
 cargo test --locked
 
@@ -49,13 +52,21 @@ The project is split into a library crate and two binaries:
 
 - **`src/lib.rs`** — Core logic. `Config` struct holds generation parameters; `generate_ids()`
   validates constraints, builds all valid adjective-noun pairs, filters by length/alliteration, and
-  randomly samples `count` unique IDs. Returns `HashSet<String>`.
+  randomly samples `count` unique IDs. Returns `HashSet<String>`. `generate_ids_default()` and
+  `count_available_default()` are convenience wrappers that use the crate's built-in word lists, so
+  library consumers don't need to supply their own.
+- **`src/words/`** — Word-list module (`pub mod words`), owned by the library. `adjs.rs` and
+  `nouns.rs` hold the lists, one word per line (for clean diffs), with `#[rustfmt::skip]`.
 - **`src/main.rs`** — CLI entry point using clap derive macros. All options also accept env vars
   with `TMULE_` prefix (e.g., `TMULE_PREFIX`).
 - **`src/replay.rs`** — Fuzzing utility that reads a JSON `Config` and invokes the binary; used for
   edge case testing.
-- **`src/words/adjs.rs`** and **`src/words/nouns.rs`** — Word lists, one word per line (for clean
-  diffs), with `#[rustfmt::skip]`.
+
+**Cargo features:** The `cli` feature (enabled by `default`) gates the CLI-only dependencies
+(`clap`, `clap-num`, `serde`, `serde_json`); both binaries declare `required-features = ["cli"]`.
+The library itself depends only on `anyhow` and `rand`, so `--no-default-features` builds the
+library alone without the CLI stack. Keep CLI-only deps out of `src/lib.rs` and `src/words/` or the
+library-only build breaks.
 
 **Generation algorithm:** pre-compute all valid combinations → filter by `max_length` (accounts for
 prefix/suffix) → optionally filter for alliteration → randomly sample without replacement.
@@ -63,7 +74,8 @@ prefix/suffix) → optionally filter for alliteration → randomly sample withou
 ## CI
 
 The CI pipeline (`.github/workflows/ci.yaml`) runs:
-1. `code_checks`: fmt, clippy, tests, vet on ubuntu
+1. `code_checks`: fmt, clippy, tests, vet, and a library-only `--no-default-features` build/test on
+   ubuntu
 2. `msrv`: verifies the crate builds on the minimum supported Rust version
 3. `build`: cross-compile for `aarch64-apple-darwin`, `aarch64-unknown-linux-gnu`,
    `x86_64-pc-windows-msvc`, `x86_64-unknown-linux-gnu`, `x86_64-unknown-linux-musl`

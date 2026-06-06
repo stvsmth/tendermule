@@ -1,6 +1,6 @@
 [package]
 name = "tendermule"
-version = "0.3.2"
+version = "0.3.3"
 edition = "2024"
 repository = "https://github.com/stvsmth/tendermule"
 description = "Generate a possibly amusing random identifier"
@@ -10,18 +10,24 @@ default-run = "tendermule"
 [lints.clippy]
 pedantic = { level = "deny", priority = -1 }
 
+[features]
+default = ["cli"]
+cli = ["dep:clap", "dep:clap-num", "dep:serde", "dep:serde_json"]
+
 [dependencies]
 anyhow = "1.0"
-clap-num = "1.0"
-clap = { version = "4.2", features = ["derive", "env"] }
 rand = "0.10"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = { version = "1.0" }
+clap = { version = "4.2", features = ["derive", "env"], optional = true }
+clap-num = { version = "1.0", optional = true }
+serde = { version = "1.0", features = ["derive"], optional = true }
+serde_json = { version = "1.0", optional = true }
 
 [[bin]]
 name = "replay"
 path = "src/replay.rs"
+required-features = ["cli"]
 
 [[bin]]
 name = "tendermule"
 path = "src/main.rs"
+required-features = ["cli"]

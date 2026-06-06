@@ -6,8 +6,7 @@ pub const MAX_IDS_COUNT: usize = 999_999;
 pub const MIN_ID_LENGTH: usize = 8;
 pub const MAX_ID_LENGTH: usize = 255;
 
-// TODO: Currently our static adjs and nouns are read via main.rs and not the library code.
-// Consider moving the adjs and nouns to this library.
+pub mod words;
 
 pub struct Config {
     pub count: usize,
@@ -125,6 +124,21 @@ pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<Ha
     let random_ids: HashSet<String> = uniq_ids.into_iter().take(config.count).collect();
 
     Ok(random_ids)
+}
+
+/// Generate a set of unique IDs using tendermule's built-in adjective and noun lists.
+///
+/// # Errors
+/// Propagates the same errors as [`generate_ids`].
+pub fn generate_ids_default(config: &Config) -> Result<HashSet<String>> {
+    generate_ids(words::adjs::ADJS, words::nouns::NOUNS, config)
+}
+
+/// Count how many unique IDs are possible using tendermule's built-in word lists,
+/// without generating them. See [`count_available`].
+#[must_use]
+pub fn count_available_default(config: &Config) -> usize {
+    count_available(words::adjs::ADJS, words::nouns::NOUNS, config)
 }
 
 fn capitalize_first_char(s: &str) -> String {
