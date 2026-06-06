@@ -1,3 +1,4 @@
+use anyhow::{Result, anyhow};
 use clap::Parser;
 use clap_num::number_range;
 use std::collections::HashSet;
@@ -58,14 +59,23 @@ fn main() {
         return;
     }
 
-    let results = generate_ids_default(&config);
-    match results {
+    match generate_ids_default(&config).and_then(non_empty_results) {
         Ok(ids) => print_results(ids),
         Err(e) => {
             eprintln!("Error: {e}");
             std::process::exit(1);
         }
     }
+}
+
+fn non_empty_results(results: HashSet<String>) -> Result<HashSet<String>> {
+    if results.is_empty() {
+        return Err(anyhow!(
+            "No unique IDs available for the given constraints."
+        ));
+    }
+
+    Ok(results)
 }
 
 fn print_results(results: HashSet<String>) {
@@ -95,5 +105,14 @@ mod tests {
                  {expected}. Update the --available example in README.md."
             );
         }
+    }
+
+    #[test]
+    fn test_empty_success_is_classified_as_error() {
+        let result = non_empty_results(HashSet::new()).unwrap_err();
+        assert_eq!(
+            result.to_string(),
+            "No unique IDs available for the given constraints."
+        );
     }
 }

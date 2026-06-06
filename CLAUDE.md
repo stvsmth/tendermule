@@ -1,7 +1,7 @@
 ## Project Overview
 
 **tendermule** is a Rust CLI utility and library that generates unique, memorable random
-identifiers in `AdjectiveNoun` format (e.g., "WastefulGuppy", "CurvyDancer"). Identifiers are under
+identifiers in `AdjectiveNoun` format (e.g., "WastefulGuppy", "CurvyDancer"). Identifiers up to
 16 characters by default, with optional prefix/suffix and alliteration support.
 
 ## Commands
