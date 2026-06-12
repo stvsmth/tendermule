@@ -48,14 +48,14 @@ Check how many unique identifiers are possible at a given max length:
 
 ```bash
 $ tendermule --available --max-length 8
-48029
+48473
 
 $ tendermule --available --max-length 16
-633840
+647520
 
 # This is aware of options like --prefix
 $ tendermule --available --max-length 16 --prefix stv
-550654
+560721
 ```
 
 See `--help` for other options.

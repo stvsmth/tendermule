@@ -93,7 +93,7 @@ mod tests {
     /// changed, update the `--available` example in README.md to match the new counts.
     #[test]
     fn test_available_counts_match_readme() {
-        for (max_length, expected) in [(8, 48_029_usize), (12, 460_233), (16, 633_840)] {
+        for (max_length, expected) in [(8, 48_473_usize), (12, 467_972), (16, 647_520)] {
             let config = Config {
                 max_length,
                 ..Config::default()
