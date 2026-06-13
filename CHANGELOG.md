@@ -1,5 +1,42 @@
 # Changelog
 
+## v0.3.5 2026-06-12
+
+### Added
+  * Additional nouns in the built-in word list.
+
+## v0.3.4 2026-06-06
+
+### Fixed
+  * Avoid a panic when no identifier can be generated for the given constraints; return an
+    error instead.
+
+## v0.3.3 2026-06-06
+
+### Added
+  * `generate_ids_default()` and `count_available_default()` wrappers, so library consumers can
+    use the built-in word lists without supplying their own.
+
+### Changed
+  * Split into a library and CLI: the `cli` feature gates the CLI-only dependencies
+    (`clap`, `clap-num`, `serde`, `serde_json`), so `--no-default-features` builds the library
+    alone.
+
+### Other
+  * Removed duplicate tests.
+
+## v0.3.2 2026-04-11
+
+### Other
+  * Added supply-chain checks (`cargo-audit`, `cargo-vet`).
+  * Bumped dependencies and fixed CI.
+
+## v0.3.1 2026-04-09
+
+### Other
+  * CI fix (`upload-artifact@v6` for Node 24).
+  * Bumped dependencies, updated adjective/noun lists, tidied anyhow error messages.
+
 ## v0.3.0 2026-03-12
 
 ### Added
