@@ -2,6 +2,7 @@
 name = "tendermule"
 version = "0.3.5"
 edition = "2024"
+rust-version = "1.85.0"
 repository = "https://github.com/stvsmth/tendermule"
 description = "Generate a possibly amusing random identifier"
 license-file = "LICENSE"
