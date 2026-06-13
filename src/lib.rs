@@ -59,7 +59,7 @@ pub fn count_available(adjs: &[&str], nouns: &[&str], config: &Config) -> usize 
 /// * `config` - A `Config` struct that contains the constraints for the ID generation
 ///
 /// # Errors
-/// * Returns an when passed parameters do not meet the constraints
+/// * Returns an error when passed parameters do not meet the constraints
 /// * Returns an error when no unique IDs are available for the given constraints
 ///
 pub fn generate_ids(adjs: &[&str], nouns: &[&str], config: &Config) -> Result<HashSet<String>> {
